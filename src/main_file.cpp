@@ -71,7 +71,7 @@ void key_callback(GLFWwindow *window, int key,
         if (key == GLFW_KEY_UP) speed_x = -3.14;
         if (key == GLFW_KEY_DOWN) speed_x = 3.14;
     }
-
+    /*tralalal */
 
     if (action == GLFW_RELEASE) {
         if (key == GLFW_KEY_LEFT) speed_y = 0;
