@@ -28,11 +28,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "shaderprogram.h"
 #include "main_file.h"
 #include "Camera.h"
+#include "yaml-cpp/yaml.h"
 
 using namespace glm;
 
-float speed_x = 0; // [radians/s]
-float speed_y = 0; // [radians/s]
 
 //Shader program object
 ShaderProgram *shaderProgram;
@@ -72,6 +71,11 @@ void initOpenGLProgram(GLFWwindow *window) {
   //disable mouse cursor
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
+  //set cursor position to the middle of the window
+  //TODO: these coordinates shoud not be hardcoded
+  int xpos, ypos;
+  glfwGetWindowSize(window, &xpos, &ypos);
+  glfwSetCursorPos(window, xpos / 2, ypos / 2);
 
   glClearColor(0, 0, 0, 1); //Clear the screen to black
   glEnable(GL_DEPTH_TEST); //Turn on Z-Buffer
@@ -80,8 +84,7 @@ void initOpenGLProgram(GLFWwindow *window) {
   std::cout << "OpenGL vesion: " << glGetString(GL_VERSION) << "\n";
   std::cout << "Shading Language version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
 
-  shaderProgram = new ShaderProgram("vshader.glsl", NULL,
-                                    "fshader.glsl"); //Read, compile and link the shader program
+  shaderProgram = new ShaderProgram("vshader.glsl", NULL, "fshader.glsl"); //Read, compile and link the shader program
 
 
   //*****Proeparation for drawing of a single object*******
@@ -152,7 +155,7 @@ void drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 mV, mat4
 
 //Procedure which draws the scene
 void drawScene(GLFWwindow *window) {
-  //************Place the drawing code here******************l
+  //************Place the drawing code here******************
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear color and depth buffers
 
@@ -160,7 +163,7 @@ void drawScene(GLFWwindow *window) {
   glm::mat4 V = camera->getVievMatrix(); //get P and V matrices from camera singleton
 
   //Compute model matrix
-  glm::mat4 M = glm::mat4(1.0f); //teapot doen't rotate
+  glm::mat4 M = glm::mat4(1.0f); //teapot doesn't rotate
 
   //Draw object
   drawObject(vao, shaderProgram, P, V, M);
@@ -184,15 +187,13 @@ int main(void) {
   window = glfwCreateWindow(500, 500, "OpenGL", NULL,
                             NULL);  //Create 500x500 window with "OpenGL" as well as OpenGL context.
 
-  if (!window) //If window could not be created, then end the program
-  {
+  if (!window) {
     fprintf(stderr, "Can't create window.\n");
     glfwTerminate();
     exit(EXIT_FAILURE);
   }
 
-  glfwMakeContextCurrent(
-      window); //Since this moment, the window context is active and OpenGL commands will work with it.
+  glfwMakeContextCurrent(window); //the window context is active
   glfwSwapInterval(1); //Synchronize with the first VBLANK signal
 
   if (glewInit() != GLEW_OK) { //Initialize GLEW library

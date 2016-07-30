@@ -1,0 +1,6 @@
+---
+settings:
+  window:
+    fullscreen: false
+    width: 500
+    height: 500
