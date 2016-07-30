@@ -68,6 +68,11 @@ void error_callback(int error, const char *description) {
 //Initialization procedure
 void initOpenGLProgram(GLFWwindow *window) {
   //************Insert initialization code here************
+
+  //disable mouse cursor
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
+
   glClearColor(0, 0, 0, 1); //Clear the screen to black
   glEnable(GL_DEPTH_TEST); //Turn on Z-Buffer
   glfwSetKeyCallback(window, Camera::key_callback); //Register key event processing procedure
@@ -127,7 +132,8 @@ void drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 mV, mat4
   //Retrieves the slot number corresponding to a uniform variable of a given name.
   //WARNING! "P" in the instruction above corresponds to the declaration "uniform mat4 P;" in the vertex shader,
   //while mP in glm::value_ptr(mP) corresponds to the argument "mat4 mP;" in THIS file.
-  //The whole line below copies data from variable mP to the uniform variable P in the vertex shader. The rest of the instructions work similarly.
+  //The whole line below copies data from variable mP to the uniform variable P in the vertex shader.
+  // The rest of the instructions work similarly.
   glUniformMatrix4fv(shaderProgram->getUniformLocation("P"), 1, false, glm::value_ptr(mP));
   glUniformMatrix4fv(shaderProgram->getUniformLocation("V"), 1, false, glm::value_ptr(mV));
   glUniformMatrix4fv(shaderProgram->getUniformLocation("M"), 1, false, glm::value_ptr(mM));

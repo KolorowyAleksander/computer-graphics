@@ -73,8 +73,7 @@ void Camera::computeCamera(GLFWwindow *window, float deltaTime) {
                               0,
                               cos(horizontalSightAngle - PI / 2.0f));
 
-  this->up = glm::vec3(0.0f, 1.0f, 0.0f);  //glm::cross(right, direction);
-  std::cout << moveX << " and " << moveY << "\n";
+  this->up = glm::cross(right, direction);
   this->position += direction * deltaTime * moveSpeed * (float) moveX + right * deltaTime * moveSpeed * (float) moveY;
   this->viewMatrix = glm::lookAt(position, position + direction, up);
 }
