@@ -21,14 +21,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include "constants.h"
 #include "allmodels.h"
-#include "lodepng.h"
 #include "shaderprogram.h"
 #include "main_file.h"
+#include "Camera.h"
 
 using namespace glm;
 
@@ -43,6 +42,9 @@ GLuint vao;
 GLuint bufVertices; //handle for VBO buffer which stores vertex coordinates
 GLuint bufColors;  //handle for VBO buffer which stores vertex colors
 GLuint bufNormals; //handle for VBO buffer which stores vertex normals
+
+//Camera global variable
+Camera *camera = Camera::getInstance();
 
 //Cube
 /*float* vertices=Models::CubeInternal::vertices;
@@ -59,188 +61,154 @@ int vertexCount = Models::TeapotInternal::vertexCount;
 
 //Error handling procedure
 void error_callback(int error, const char *description) {
-    fputs(description, stderr);
+  fputs(description, stderr);
 }
-
-//Key event processing procedure
-void key_callback(GLFWwindow *window, int key,
-                  int scancode, int action, int mods) {
-    if (action == GLFW_PRESS) {
-        if (key == GLFW_KEY_LEFT) speed_y = -3.14;
-        if (key == GLFW_KEY_RIGHT) speed_y = 3.14;
-        if (key == GLFW_KEY_UP) speed_x = -3.14;
-        if (key == GLFW_KEY_DOWN) speed_x = 3.14;
-    }
-
-
-    if (action == GLFW_RELEASE) {
-        if (key == GLFW_KEY_LEFT) speed_y = 0;
-        if (key == GLFW_KEY_RIGHT) speed_y = 0;
-        if (key == GLFW_KEY_UP) speed_x = 0;
-        if (key == GLFW_KEY_DOWN) speed_x = 0;
-    }
-}
-
 
 //Initialization procedure
 void initOpenGLProgram(GLFWwindow *window) {
-    //************Insert initialization code here************
-    glClearColor(0, 0, 0, 1); //Clear the screen to black
-    glEnable(GL_DEPTH_TEST); //Turn on Z-Buffer
-    glfwSetKeyCallback(window, key_callback); //Register key event processing procedure
+  //************Insert initialization code here************
+  glClearColor(0, 0, 0, 1); //Clear the screen to black
+  glEnable(GL_DEPTH_TEST); //Turn on Z-Buffer
+  glfwSetKeyCallback(window, Camera::key_callback); //Register key event processing procedure
 
-    std::cout << "OpenGL vesion: " << glGetString(GL_VERSION) << "\n";
-    std::cout << "Shading Language version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
+  std::cout << "OpenGL vesion: " << glGetString(GL_VERSION) << "\n";
+  std::cout << "Shading Language version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
 
-    shaderProgram = new ShaderProgram("vshader.glsl", NULL,
-                                      "fshader.glsl"); //Read, compile and link the shader program
+  shaderProgram = new ShaderProgram("vshader.glsl", NULL,
+                                    "fshader.glsl"); //Read, compile and link the shader program
 
 
-    //*****Proeparation for drawing of a single object*******
-    //Build VBO buffers with object data
-    bufVertices = makeBuffer(vertices, vertexCount, sizeof(float) * 4); //VBO with vertex coordinates
-    bufColors = makeBuffer(colors, vertexCount, sizeof(float) * 4);//VBO with vertes colors
-    bufNormals = makeBuffer(normals, vertexCount, sizeof(float) * 4);//VBO with vertex normals
+  //*****Proeparation for drawing of a single object*******
+  //Build VBO buffers with object data
+  bufVertices = makeBuffer(vertices, vertexCount, sizeof(float) * 4); //VBO with vertex coordinates
+  bufColors = makeBuffer(colors, vertexCount, sizeof(float) * 4);//VBO with vertes colors
+  bufNormals = makeBuffer(normals, vertexCount, sizeof(float) * 4);//VBO with vertex normals
 
-    //Create VAO which associates VBO with attributes in shading program
-    glGenVertexArrays(1, &vao); //Generate VAO handle and store it in the global variable
+  //Create VAO which associates VBO with attributes in shading program
+  glGenVertexArrays(1, &vao); //Generate VAO handle and store it in the global variable
 
-    glBindVertexArray(vao); //Activate newly created VAO
+  glBindVertexArray(vao); //Activate newly created VAO
 
-    assignVBOtoAttribute(shaderProgram, "vertex", bufVertices,
-                         4); //"vertex" refers to the declaration "in vec4 vertex;" in vertex shader
-    assignVBOtoAttribute(shaderProgram, "color", bufColors,
-                         4); //"color" refers to the declaration "in vec4 color;" in vertex shader
-    assignVBOtoAttribute(shaderProgram, "normal", bufNormals,
-                         4); //"normal" refers to the declaration "in vec4 normal;" w vertex shader
+  assignVBOtoAttribute(shaderProgram, "vertex", bufVertices,
+                       4); //"vertex" refers to the declaration "in vec4 vertex;" in vertex shader
+  assignVBOtoAttribute(shaderProgram, "color", bufColors,
+                       4); //"color" refers to the declaration "in vec4 color;" in vertex shader
+  assignVBOtoAttribute(shaderProgram, "normal", bufNormals,
+                       4); //"normal" refers to the declaration "in vec4 normal;" w vertex shader
 
-    glBindVertexArray(0); //Deactivate VAO
-    //******End of object preparation************
+  glBindVertexArray(0); //Deactivate VAO
+  //******End of object preparation************
 
 }
 
 //Freeing of resources
 void freeOpenGLProgram() {
-    delete shaderProgram; //Delete shader program
+  delete shaderProgram; //Delete shader program
 
-    glDeleteVertexArrays(1, &vao); //Delete VAO
-    //Delete VBOs
-    glDeleteBuffers(1, &bufVertices);
-    glDeleteBuffers(1, &bufColors);
-    glDeleteBuffers(1, &bufNormals);
+  glDeleteVertexArrays(1, &vao); //Delete VAO
+  //Delete VBOs
+  glDeleteBuffers(1, &bufVertices);
+  glDeleteBuffers(1, &bufColors);
+  glDeleteBuffers(1, &bufNormals);
 
 }
 
 void drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 mV, mat4 mM) {
-    //Turn on the shading program that will be used for drawing.
-    //While in this program it would be perfectly correct to execute this once in the initOpenGLProgram,
-    //in most cases more than one shading program is used and hence, it should be switched between drawing of objects
-    //while we render a single scene.
-    shaderProgram->use();
+  //Turn on the shading program that will be used for drawing.
+  //While in this program it would be perfectly correct to execute this once in the initOpenGLProgram,
+  //in most cases more than one shading program is used and hence, it should be switched between drawing of objects
+  //while we render a single scene.
+  shaderProgram->use();
 
-    //Set uniform variables P,V and M in the vertex shader by assigning the appropriate matrices
-    //In the lines below, expression:
-    //  shaderProgram->getUniformLocation("P")
-    //Retrieves the slot number corresponding to a uniform variable of a given name.
-    //WARNING! "P" in the instruction above corresponds to the declaration "uniform mat4 P;" in the vertex shader,
-    //while mP in glm::value_ptr(mP) corresponds to the argument "mat4 mP;" in THIS file.
-    //The whole line below copies data from variable mP to the uniform variable P in the vertex shader. The rest of the instructions work similarly.
-    glUniformMatrix4fv(shaderProgram->getUniformLocation("P"), 1, false, glm::value_ptr(mP));
-    glUniformMatrix4fv(shaderProgram->getUniformLocation("V"), 1, false, glm::value_ptr(mV));
-    glUniformMatrix4fv(shaderProgram->getUniformLocation("M"), 1, false, glm::value_ptr(mM));
+  //Set uniform variables P,V and M in the vertex shader by assigning the appropriate matrices
+  //In the lines below, expression:
+  //  shaderProgram->getUniformLocation("P")
+  //Retrieves the slot number corresponding to a uniform variable of a given name.
+  //WARNING! "P" in the instruction above corresponds to the declaration "uniform mat4 P;" in the vertex shader,
+  //while mP in glm::value_ptr(mP) corresponds to the argument "mat4 mP;" in THIS file.
+  //The whole line below copies data from variable mP to the uniform variable P in the vertex shader. The rest of the instructions work similarly.
+  glUniformMatrix4fv(shaderProgram->getUniformLocation("P"), 1, false, glm::value_ptr(mP));
+  glUniformMatrix4fv(shaderProgram->getUniformLocation("V"), 1, false, glm::value_ptr(mV));
+  glUniformMatrix4fv(shaderProgram->getUniformLocation("M"), 1, false, glm::value_ptr(mM));
 
-    glUniform4f(shaderProgram->getUniformLocation("lightPos0"), 0, 0, -5, 1);
+  glUniform4f(shaderProgram->getUniformLocation("lightPos0"), 0, 0, 5, 1);
 
-    //Activation of VAO and therefore making all associations of VBOs and attributes current
-    glBindVertexArray(vao);
+  //Activation of VAO and therefore making all associations of VBOs and attributes current
+  glBindVertexArray(vao);
 
-    //Drawing of an object
-    glDrawArrays(GL_TRIANGLES, 0, vertexCount);
+  //Drawing of an object
+  glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
-    //Tidying up after ourselves (not needed if we use VAO for every object)
-    glBindVertexArray(0);
+  //Tidying up after ourselves (not needed if we use VAO for every object)
+  glBindVertexArray(0);
 }
 
 //Procedure which draws the scene
-void drawScene(GLFWwindow *window, float angle_x, float angle_y) {
-    //************Place the drawing code here******************l
+void drawScene(GLFWwindow *window) {
+  //************Place the drawing code here******************l
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear color and depth buffers
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear color and depth buffers
 
-    glm::mat4 P = glm::perspective(50 * PI / 180, 1.0f, 1.0f, 50.0f); //Compute projection matrix
+  glm::mat4 P = camera->getPerspectiveMatrix();
+  glm::mat4 V = camera->getVievMatrix(); //get P and V matrices from camera singleton
 
-    glm::mat4 V = glm::lookAt( //Compute view matrix
-            glm::vec3(0.0f, 0.0f, -5.0f),
-            glm::vec3(0.0f, 0.0f, 0.0f),
-            glm::vec3(0.0f, 1.0f, 0.0f));
+  //Compute model matrix
+  glm::mat4 M = glm::mat4(1.0f); //teapot doen't rotate
 
+  //Draw object
+  drawObject(vao, shaderProgram, P, V, M);
 
-    //Compute model matrix
-    glm::mat4 M = glm::mat4(1.0f);
-    M = glm::rotate(M, angle_x, glm::vec3(1, 0, 0));
-    M = glm::rotate(M, angle_y, glm::vec3(0, 1, 0));
-
-    //Draw object
-    drawObject(vao, shaderProgram, P, V, M);
-
-    //Swap front and back buffers
-    glfwSwapBuffers(window);
+  //Swap front and back buffers
+  glfwSwapBuffers(window);
 
 }
 
 
 int main(void) {
-    GLFWwindow *window; //Pointer to window object
+  GLFWwindow *window; //Pointer to window object
 
-    glfwSetErrorCallback(error_callback);//Register error callback procedure
+  glfwSetErrorCallback(error_callback);//Register error callback procedure
 
-    if (!glfwInit()) { //Initialize GLFW procedure
-        fprintf(stderr, "Can't initialize GLFW GLFW.\n");
-        exit(EXIT_FAILURE);
-    }
+  if (!glfwInit()) { //Initialize GLFW procedure
+    fprintf(stderr, "Can't initialize GLFW GLFW.\n");
+    exit(EXIT_FAILURE);
+  }
 
-    window = glfwCreateWindow(500, 500, "OpenGL", NULL,
-                              NULL);  //Create 500x500 window with "OpenGL" as well as OpenGL context.
+  window = glfwCreateWindow(500, 500, "OpenGL", NULL,
+                            NULL);  //Create 500x500 window with "OpenGL" as well as OpenGL context.
 
-    if (!window) //If window could not be created, then end the program
-    {
-        fprintf(stderr, "Can't create window.\n");
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
+  if (!window) //If window could not be created, then end the program
+  {
+    fprintf(stderr, "Can't create window.\n");
+    glfwTerminate();
+    exit(EXIT_FAILURE);
+  }
 
-    glfwMakeContextCurrent(
-            window); //Since this moment, the window context is active and OpenGL commands will work with it.
-    glfwSwapInterval(1); //Synchronize with the first VBLANK signal
+  glfwMakeContextCurrent(
+      window); //Since this moment, the window context is active and OpenGL commands will work with it.
+  glfwSwapInterval(1); //Synchronize with the first VBLANK signal
 
-    if (glewInit() != GLEW_OK) { //Initialize GLEW library
-        fprintf(stderr, "Can't initialize GLEW.\n");
-        exit(EXIT_FAILURE);
-    }
+  if (glewInit() != GLEW_OK) { //Initialize GLEW library
+    fprintf(stderr, "Can't initialize GLEW.\n");
+    exit(EXIT_FAILURE);
+  }
 
-    initOpenGLProgram(window); //Initialization procedure
+  initOpenGLProgram(window); //Initialization procedure
+  double deltaTime;
+  glfwSetTime(0); //Zero time counter
 
-    float angle_x = 0; //Object rotation angle
-    float angle_y = 0; //Object rotation angle
-
+  //Main loop
+  while (!glfwWindowShouldClose(window)) {
+    deltaTime = glfwGetTime();
+    camera->computeCamera(window, (float) deltaTime);
     glfwSetTime(0); //Zero time counter
+    drawScene(window); //Execute drawing procedure
+    glfwPollEvents(); //Execute callback procedures which process events
+  }
 
-    //Main loop
-    while (!glfwWindowShouldClose(window)) //As long as window shouldnt be closed...
-    {
-        //std::cout << "Window is open" << "\n";
-        angle_x += speed_x *
-                   glfwGetTime(); //Increase angle by the angle speed times the time passed since the previous frame
-        angle_y += speed_y *
-                   glfwGetTime(); //Increase angle by the angle speed times the time passed since the previous frame
-        glfwSetTime(0); //Zero time counter
-        drawScene(window, angle_x, angle_y); //Execute drawing procedure
-        glfwPollEvents(); //Execute callback procedures which process events
-    }
+  freeOpenGLProgram(); //Free resources
 
-    freeOpenGLProgram(); //Free resources
-
-    glfwDestroyWindow(window); //Delete OpenGL context and window
-    glfwTerminate(); //Free GLFW resources
-    exit(EXIT_SUCCESS);
+  glfwDestroyWindow(window); //Delete OpenGL context and window
+  glfwTerminate(); //Free GLFW resources
+  exit(EXIT_SUCCESS);
 }

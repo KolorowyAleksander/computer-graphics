@@ -2,10 +2,11 @@ cmake_minimum_required(VERSION 3.5)
 project(grafika)
 
 #to squelch the casting from char* to const char*
-set(CMAKE_CXX_FLAGS "-Wno-write-strings")
+set(CMAKE_CXX_FLAGS "-Wno-write-strings -std=c++11")
 
 #set source .cpp files to compile
-set(SOURCES src/cube.cpp
+set(SOURCES src/Camera.cpp
+            src/cube.cpp
             src/teapot.cpp
             src/lodepng.cpp
             src/shaderprogram.cpp
