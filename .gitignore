@@ -89,3 +89,6 @@ fabric.properties
 *.exe
 *.out
 *.app
+
+#CLion stuff
+.idea
