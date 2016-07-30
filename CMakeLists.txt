@@ -12,8 +12,8 @@ set(SOURCES src/Camera.cpp
             src/shaderprogram.cpp
             src/model.cpp
             src/main_file.cpp)
-include_directories(src) #include headers for classes
-include_directories(glm) # include glm library headers
+#include_directories(src) #include headers for classes
+#include_directories(glm) # include glm library headers
 
 #find opengl main package end include headers if found
 find_package(OpenGL REQUIRED)
