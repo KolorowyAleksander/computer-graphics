@@ -10,6 +10,7 @@
 #include <glm/vec3.hpp>
 #include <glm/detail/type_mat.hpp>
 #include "constants.h"
+#include "Settings.h"
 
 class Camera { //camera singleton
  private:
@@ -25,7 +26,10 @@ class Camera { //camera singleton
   float horizontalSightAngle, verticalSightAngle;
 
   // const float fieldOfVision = 45.0f; field of vision is constant, so i might as well
-  const glm::mat4 perspectiveMatrix = glm::perspective(45.0f * PI / 180, 1.0f, 1.0f, 50.0f); // perspective matrix
+  const glm::mat4 perspectiveMatrix = glm::perspective(45.0f * PI / 180,
+                                                       (float) Settings::getInstance()->getWindowWidth()/Settings::getInstance()->getWindowHeight(),
+                                                       1.0f,
+                                                       50.0f); // perspective matrix
   glm::mat4 viewMatrix;
 
  public:
