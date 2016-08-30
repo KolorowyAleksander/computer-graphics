@@ -1,7 +1,3 @@
-//
-// Created by atka on 30.08.16.
-//
-
 #include <yaml-cpp/yaml.h>
 #include <iostream>
 #include "Settings.h"
