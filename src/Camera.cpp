@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include "Camera.h"
+#include "Settings.h"
 
 
 Camera *Camera::instance(nullptr);
