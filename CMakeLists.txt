@@ -68,15 +68,14 @@ set(ALL_FILES ${SOURCES} ${SHADERS})
 #add target for compilation
 add_executable(grafika ${ALL_FILES})
 
-#copy glsl shader files to bin directory for runtime compilation
-add_custom_command(TARGET grafika POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_SOURCE_DIR}/shaders $<TARGET_FILE_DIR:grafika>)
 
 #copy settings file to build directory
 add_custom_command(TARGET grafika POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy
-        ${CMAKE_SOURCE_DIR}/${SETTINGS} $<TARGET_FILE_DIR:grafika>)
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/${SETTINGS} $<TARGET_FILE_DIR:grafika>)
+
+#copy glsl shader files to bin directory for runtime compilation
+add_custom_command(TARGET grafika POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/shaders $<TARGET_FILE_DIR:grafika>)
 
 #link all needed libraries against the object files
 target_link_libraries(grafika ${OPENGL_LIBRARIES})
