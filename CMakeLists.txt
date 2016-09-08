@@ -8,7 +8,8 @@ set(CMAKE_CXX_FLAGS "-Wno-write-strings -std=c++11")
 set(SETTINGS settings.yaml)
 
 #set source .cpp files to compile
-set(SOURCES src/Camera.cpp
+set(SOURCES src/allmodels.h
+            src/Camera.cpp
             src/Settings.cpp
             src/cube.cpp
             src/teapot.cpp
@@ -54,8 +55,8 @@ endif()
 
 #change module path to project to include FindGLFW.cmake
 #find GLFW3 library and include headers if found
-set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
-find_package(GLFW REQUIRED)
+#set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
+find_package(glfw3 3.2 REQUIRED)
 if(GLFW_FOUND)
     include_directories(${GLFW_INCLUDE_DIR})
 else()
@@ -63,7 +64,7 @@ else()
 endif()
 
 #set source .cpp files for compilation
-set(ALL_FILES ${SOURCES} ${SHADERS})
+set(ALL_FILES ${SOURCES} ${SHADERS} src/Maze.cpp src/Maze.h)
 
 #add target for compilation
 add_executable(grafika ${ALL_FILES})
@@ -80,5 +81,5 @@ add_custom_command(TARGET grafika POST_BUILD
 #link all needed libraries against the object files
 target_link_libraries(grafika ${OPENGL_LIBRARIES})
 target_link_libraries(grafika ${GLEW_LIBRARIES})
-target_link_libraries(grafika ${GLFW_LIBRARIES})
+target_link_libraries(grafika glfw)
 target_link_libraries(grafika ${YAML_CPP_LIBRARIES})

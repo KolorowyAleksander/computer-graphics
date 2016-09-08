@@ -23,18 +23,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace Models {
 
-	class Model {
-		public:
-			int vertexCount;
-			float *vertices;
-			float *normals;
-			float *vertexNormals;
-			float *texCoords;
-			float *colors;
-					
-			virtual void drawSolid()=0;
-			virtual void drawWire();
-	};
+class Model {
+ public:
+  int vertexCount;
+  float *vertices;
+  float *normals;
+  float *vertexNormals;
+  float *texCoords;
+  float *colors;
+
+  virtual void drawSolid() = 0;
+  virtual void drawWire();
+};
 }
 
 #endif

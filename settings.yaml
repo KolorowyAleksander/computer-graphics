@@ -2,5 +2,5 @@
 settings:
   window:
     fullscreen: false
-    width: 500
-    height: 500
+    width: 1376
+    height: 768
