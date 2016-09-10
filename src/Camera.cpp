@@ -3,6 +3,7 @@
  */
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <GLFW/glfw3.h>
 #include <iostream>
 #include "Camera.h"
 #include "Settings.h"
@@ -27,6 +28,37 @@ void Camera::key_callback(GLFWwindow *window, int key, int scancode, int action,
       case GLFW_KEY_D:
         camera->setMoveY(1);
         break;
+      case GLFW_KEY_ESCAPE:
+        glfwSetWindowShouldClose(window, 1);
+        /* case (GLFW_KEY_LEFT_CONTROL && GLFW_KEY_F): {
+           int widthMM, heightMM;
+           GLFWmonitor *monitor = glfwGetPrimaryMonitor();
+           glfwGetMonitorPhysicalSize(monitor,
+                                      & widthMM,
+                                      & heightMM);
+
+
+           if(monitor){
+             glfwSetWindowMonitor(window,
+                                  monitor,
+                                  0,
+                                  0,
+                                  widthMM,
+                                  heightMM,
+                                  GLFW_DONT_CARE);
+             std::cout<<"if ctrl+f"<<std::endl;
+           } else { //monitor jest 0 wiec mamy window mode
+             glfwSetWindowMonitor(window,
+                                  monitor,
+                                  50,
+                                  50,
+                                  Settings::getInstance()->getWindowWidth(),
+                                  Settings::getInstance()->getWindowHeight(),
+                                  0);
+             std::cout<<"else ctrl+f"<<std::endl;
+           }
+           std::cout<<"ctrl+f"<<std::endl;
+         }*/
       default:
         break;
     }
@@ -120,6 +152,11 @@ Camera::Camera() {
   this->up = glm::cross(right, direction);
 
   this->viewMatrix = glm::lookAt(position, position + direction, up);
+  this->perspectiveMatrix = glm::perspective(45.0f * PI / 180,
+                                             (float) Settings::getInstance()->getWindowWidth()
+                                                 / Settings::getInstance()->getWindowHeight(),
+                                             1.0f,
+                                             50.0f); // perspective matrix
 }
 
 //maybe constructor for any point in space would be nice?

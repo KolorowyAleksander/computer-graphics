@@ -44,7 +44,7 @@ GLuint bufColors;  //handle for VBO buffer which stores vertex colors
 GLuint bufNormals; //handle for VBO buffer which stores vertex normals
 
 //Camera global variable
-Camera *camera = Camera::getInstance();
+/*Camera *camera = Camera::getInstance();*/
 
 
 //Cube
@@ -161,8 +161,8 @@ void drawScene(GLFWwindow *window) {
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear color and depth buffers
 
-  glm::mat4 P = camera->getPerspectiveMatrix();
-  glm::mat4 V = camera->getVievMatrix(); //get P and V matrices from camera singleton
+  glm::mat4 P = Camera::getInstance()->getPerspectiveMatrix();
+  glm::mat4 V = Camera::getInstance()->getVievMatrix(); //get P and V matrices from camera singleton
 
   //Compute model matrix
   glm::mat4 M = glm::mat4(1.0f); //teapot doesn't rotate
@@ -185,12 +185,14 @@ int main(void) {
     fprintf(stderr, "Can't initialize GLFW GLFW.\n");
     exit(EXIT_FAILURE);
   }
+    GLFWmonitor*monitor= glfwGetPrimaryMonitor();
 
-  window = glfwCreateWindow(Settings::getInstance()->getWindowWidth(),
-                            Settings::getInstance()->getWindowHeight(),
-                            "OpenGL",
-                            NULL,
-                            NULL);  //Create window with "OpenGL" as well as OpenGL context.
+    window = glfwCreateWindow(Settings::getInstance()->getWindowWidth(),
+                              Settings::getInstance()->getWindowHeight(),
+                              "OpenGL",
+                              Settings::getInstance()->getMonitorOrNull(),
+                              NULL);  //Create window with "OpenGL" as well as OpenGL context.
+
 
   if (!window) {
     fprintf(stderr, "Can't create window.\n");
@@ -213,7 +215,7 @@ int main(void) {
   //Main loop
   while (!glfwWindowShouldClose(window)) {
     deltaTime = glfwGetTime();
-    camera->computeCamera(window, (float) deltaTime);
+    Camera::getInstance()->computeCamera(window, (float) deltaTime);
     glfwSetTime(0); //Zero time counter
     drawScene(window); //Execute drawing procedure
     glfwPollEvents(); //Execute callback procedures which process events

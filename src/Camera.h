@@ -26,16 +26,14 @@ class Camera { //camera singleton
   float horizontalSightAngle, verticalSightAngle;
 
   // const float fieldOfVision = 45.0f; field of vision is constant, so i might as well
-  const glm::mat4 perspectiveMatrix = glm::perspective(45.0f * PI / 180,
-                                                       (float) Settings::getInstance()->getWindowWidth()/Settings::getInstance()->getWindowHeight(),
-                                                       1.0f,
-                                                       50.0f); // perspective matrix
+  glm::mat4 perspectiveMatrix;
   glm::mat4 viewMatrix;
 
  public:
   static Camera *getInstance();
   static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
   void computeCamera(GLFWwindow *window, float deltaTime);
+
   glm::mat4 getPerspectiveMatrix();
   glm::mat4 getVievMatrix();
   void setMoveX(int moveX);
