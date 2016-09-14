@@ -4,3 +4,10 @@ settings:
     fullscreen: true
     width: 500
     height: 500
+  player:
+    starting point:
+      x: 0.0
+      y: 0.0
+      z: 5.0
+    move speed: 3.0
+    mouse speed: 0.1
