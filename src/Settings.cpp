@@ -6,10 +6,14 @@ Settings *Settings::instance(nullptr);
 
 Settings::Settings() {
   this->config = YAML::LoadFile("settings.yaml");
+
   this->monitor = glfwGetPrimaryMonitor();
-  glfwGetMonitorPhysicalSize(this->monitor,
-                             &widthMM,
-                             &heightMM);
+  const GLFWvidmode *mode = glfwGetVideoMode(this->monitor);
+  this->widthMM = mode->width;
+  this->heightMM = mode->height;
+
+
+
   if (config != nullptr)
     std::cout << "settings loaded" << std::endl;
 }
@@ -22,11 +26,11 @@ Settings *Settings::getInstance() {
 }
 
 int Settings::getWindowHeight() {
-  return isFullscreen() ? heightMM : config["settings"]["window"]["height"].as<int>();
+  return isFullscreen() ? this->heightMM : config["settings"]["window"]["height"].as<int>();
 }
 
 int Settings::getWindowWidth() {
-  return isFullscreen() ? widthMM : config["settings"]["window"]["width"].as<int>();
+  return isFullscreen() ? this->widthMM : config["settings"]["window"]["width"].as<int>();
 }
 
 bool Settings::isFullscreen() {

@@ -174,6 +174,9 @@ int main(void) {
     fprintf(stderr, "Can't initialize GLFW GLFW.\n");
     exit(EXIT_FAILURE);
   }
+  
+  std::cout<<Settings::getInstance()->getWindowHeight()<<": height"<<std::endl;
+  std::cout<<Settings::getInstance()->getWindowWidth()<<": width"<<std::endl;
 
   window = glfwCreateWindow(Settings::getInstance()->getWindowWidth(),
                             Settings::getInstance()->getWindowHeight(),
