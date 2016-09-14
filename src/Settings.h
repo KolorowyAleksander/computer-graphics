@@ -17,6 +17,12 @@ class Settings {
   static Settings *getInstance();
   int getWindowHeight();
   int getWindowWidth();
+  float getStartingPointX();
+  float getStartingPointY();
+  float getStartingPointZ();
+  float getMoveSpeed();
+  float getMouseSpeed();
+
   GLFWmonitor *getMonitorOrNull();
 
 };

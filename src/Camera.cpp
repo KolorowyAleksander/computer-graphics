@@ -142,9 +142,11 @@ Camera::Camera() {
   this->moveY = 0;
   this->horizontalSightAngle = 3.14f;
   this->verticalSightAngle = 0.0f;
-  this->moveSpeed = 3.0f;
-  this->mouseSpeed = 0.1f;
-  this->position = glm::vec3(0.0f, 0.0f, 5.0f);
+  this->moveSpeed = Settings::getInstance()->getMoveSpeed();
+  this->mouseSpeed = Settings::getInstance()->getMouseSpeed();
+  this->position = glm::vec3(Settings::getInstance()->getStartingPointX(),
+                             Settings::getInstance()->getStartingPointY(),
+                             Settings::getInstance()->getStartingPointZ());
 
   this->direction = glm::vec3(cos(verticalSightAngle) * sin(horizontalSightAngle),
                               sin(verticalSightAngle),
