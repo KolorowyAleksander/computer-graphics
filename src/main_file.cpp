@@ -66,6 +66,7 @@ void initOpenGLProgram(GLFWwindow *window) {
   //disable mouse cursor
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
+
   glClearColor(0, 0, 0, 1); //Clear the screen to black
   glEnable(GL_DEPTH_TEST); //Turn on Z-Buffer
   glfwSetKeyCallback(window, Camera::key_callback); //Register key event processing procedure
@@ -109,6 +110,8 @@ void freeOpenGLProgram() {
   glDeleteBuffers(1, &bufColors);
   glDeleteBuffers(1, &bufNormals);
 
+  delete Camera::getInstance();
+  delete Settings::getInstance();
 }
 
 void drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 mV, mat4 mM) {
@@ -152,7 +155,7 @@ void drawScene(GLFWwindow *window) {
   glm::mat4 V = Camera::getInstance()->getVievMatrix(); //get P and V matrices from camera singleton
 
   //Compute model matrix
-  glm::mat4 M = glm::mat4(1.0f); //teapot doesn't rotate
+  glm::mat4 M = glm::mat4(1.0f);
 
   //Draw object
   drawObject(vao, shaderProgram, P, V, M);

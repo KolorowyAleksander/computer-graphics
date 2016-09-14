@@ -107,7 +107,10 @@ void Camera::computeCamera(GLFWwindow *window, float deltaTime) {
                               cos(horizontalSightAngle - PI / 2.0f));
 
   this->up = glm::cross(right, direction);
-  this->position += direction * deltaTime * moveSpeed * (float) moveX + right * deltaTime * moveSpeed * (float) moveY;
+
+  this->position += direction * deltaTime * moveSpeed * (float) this->moveX;
+  this->position += right * deltaTime * moveSpeed * (float) this->moveY;
+
   this->viewMatrix = glm::lookAt(position, position + direction, up);
 }
 
@@ -135,6 +138,8 @@ void Camera::setMoveY(int moveY) {
 
 //default starting point is -5.0f actually
 Camera::Camera() {
+  this->moveX = 0;
+  this->moveY = 0;
   this->horizontalSightAngle = 3.14f;
   this->verticalSightAngle = 0.0f;
   this->moveSpeed = 3.0f;
