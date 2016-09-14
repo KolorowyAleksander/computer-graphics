@@ -30,9 +30,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "yaml-cpp/yaml.h"
 #include "Settings.h"
 
-
 using namespace glm;
-
 
 //Shader program object
 ShaderProgram *shaderProgram;
@@ -43,15 +41,7 @@ GLuint bufVertices; //handle for VBO buffer which stores vertex coordinates
 GLuint bufColors;  //handle for VBO buffer which stores vertex colors
 GLuint bufNormals; //handle for VBO buffer which stores vertex normals
 
-//Camera global variable
-/*Camera *camera = Camera::getInstance();*/
 
-
-//Cube
-/*float* vertices=Models::CubeInternal::vertices;
-float* colors=Models::CubeInternal::colors;
-float* normals=Models::CubeInternal::normals;
-int vertexCount=Models::CubeInternal::vertexCount;*/
 
 //Teapot
 float *vertices = Models::TeapotInternal::vertices;
@@ -59,25 +49,22 @@ float *colors = Models::TeapotInternal::colors;
 float *normals = Models::TeapotInternal::vertexNormals;
 int vertexCount = Models::TeapotInternal::vertexCount;
 
-
 //Error handling procedure
 void error_callback(int error, const char *description) {
   fputs(description, stderr);
 }
 
-
 //Initialization procedure
 void initOpenGLProgram(GLFWwindow *window) {
   //************Insert initialization code here************
 
-  //disable mouse cursor
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
   //set cursor position to the middle of the window
-  //TODO: these coordinates shoud not be hardcoded
   int xpos, ypos;
   glfwGetWindowSize(window, &xpos, &ypos);
-  glfwSetCursorPos(window, xpos / 2, ypos / 2);
+  glfwSetCursorPos(window, (double) xpos / 2, (double) ypos / 2);
+
+  //disable mouse cursor
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
   glClearColor(0, 0, 0, 1); //Clear the screen to black
   glEnable(GL_DEPTH_TEST); //Turn on Z-Buffer
@@ -175,7 +162,6 @@ void drawScene(GLFWwindow *window) {
 
 }
 
-
 int main(void) {
   GLFWwindow *window; //Pointer to window object
 
@@ -185,13 +171,12 @@ int main(void) {
     fprintf(stderr, "Can't initialize GLFW GLFW.\n");
     exit(EXIT_FAILURE);
   }
-    GLFWmonitor*monitor= glfwGetPrimaryMonitor();
 
-    window = glfwCreateWindow(Settings::getInstance()->getWindowWidth(),
-                              Settings::getInstance()->getWindowHeight(),
-                              "OpenGL",
-                              Settings::getInstance()->getMonitorOrNull(),
-                              NULL);  //Create window with "OpenGL" as well as OpenGL context.
+  window = glfwCreateWindow(Settings::getInstance()->getWindowWidth(),
+                            Settings::getInstance()->getWindowHeight(),
+                            "OpenGL",
+                            Settings::getInstance()->getMonitorOrNull(),
+                            NULL);  //Create window with "OpenGL" as well as OpenGL context.
 
 
   if (!window) {
