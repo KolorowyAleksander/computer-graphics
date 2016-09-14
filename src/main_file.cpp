@@ -172,7 +172,6 @@ int main(void) {
     fprintf(stderr, "Can't initialize GLFW GLFW.\n");
     exit(EXIT_FAILURE);
   }
-  GLFWmonitor *monitor = glfwGetPrimaryMonitor();
 
   window = glfwCreateWindow(Settings::getInstance()->getWindowWidth(),
                             Settings::getInstance()->getWindowHeight(),
