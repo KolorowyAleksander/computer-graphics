@@ -43,8 +43,6 @@ GLuint bufVertices; //handle for VBO buffer which stores vertex coordinates
 GLuint bufColors;  //handle for VBO buffer which stores vertex colors
 GLuint bufNormals; //handle for VBO buffer which stores vertex normals
 
-//Camera global variable
-/*Camera *camera = Camera::getInstance();*/
 
 
 //Cube
