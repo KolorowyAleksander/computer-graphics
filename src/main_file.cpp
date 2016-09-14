@@ -45,12 +45,6 @@ GLuint bufNormals; //handle for VBO buffer which stores vertex normals
 
 
 
-//Cube
-/*float* vertices=Models::CubeInternal::vertices;
-float* colors=Models::CubeInternal::colors;
-float* normals=Models::CubeInternal::normals;
-int vertexCount=Models::CubeInternal::vertexCount;*/
-
 //Teapot
 float *vertices = Models::TeapotInternal::vertices;
 float *colors = Models::TeapotInternal::colors;
