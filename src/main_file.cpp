@@ -62,7 +62,6 @@ void initOpenGLProgram(GLFWwindow *window) {
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
   //set cursor position to the middle of the window
-  //TODO: these coordinates shoud not be hardcoded
   int xpos, ypos;
   glfwGetWindowSize(window, &xpos, &ypos);
   glfwSetCursorPos(window, xpos / 2, ypos / 2);
