@@ -58,13 +58,13 @@ void error_callback(int error, const char *description) {
 void initOpenGLProgram(GLFWwindow *window) {
   //************Insert initialization code here************
 
-  //disable mouse cursor
-  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
   //set cursor position to the middle of the window
   int xpos, ypos;
   glfwGetWindowSize(window, &xpos, &ypos);
-  glfwSetCursorPos(window, xpos / 2, ypos / 2);
+  glfwSetCursorPos(window, (double) xpos / 2, (double) ypos / 2);
+
+  //disable mouse cursor
+  glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
   glClearColor(0, 0, 0, 1); //Clear the screen to black
   glEnable(GL_DEPTH_TEST); //Turn on Z-Buffer
