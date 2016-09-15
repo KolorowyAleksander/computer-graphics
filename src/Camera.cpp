@@ -121,11 +121,11 @@ Camera *Camera::getInstance() {
   return instance;
 }
 
-glm::mat4 Camera::getPerspectiveMatrix() {
+glm::mat4 Camera::_getPerspectiveMatrix() {
   return this->perspectiveMatrix;
 }
 
-glm::mat4 Camera::getVievMatrix() {
+glm::mat4 Camera::_getVievMatrix() {
   return this->viewMatrix;
 }
 
@@ -162,6 +162,12 @@ Camera::Camera() {
                                                  / Settings::getInstance()->getWindowHeight(),
                                              1.0f,
                                              50.0f); // perspective matrix
+}
+glm::mat4 Camera::getPerspecitveMatrix() {
+  return getInstance()->_getPerspectiveMatrix();
+}
+glm::mat4 Camera::getViewMatrix() {
+  return getInstance()->_getVievMatrix();
 }
 
 //maybe constructor for any point in space would be nice?

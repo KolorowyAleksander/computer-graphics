@@ -17,7 +17,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #define ALL_MODELS_H
 
 #include "cube.h"
-#include "teapot.h"
+#include "Teapot.h"
 
 
 #endif

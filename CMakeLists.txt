@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 project(grafika)
 
 #to squelch the casting from char* to const char*
-set(CMAKE_CXX_FLAGS "-Wno-write-strings -std=c++11")
+set(CMAKE_CXX_FLAGS "-Wno-write-strings -std=c++14")
 
 #set configuration file
 set(SETTINGS settings.yaml)
@@ -14,11 +14,13 @@ set(SOURCES src/Maze.cpp
             src/Camera.cpp
             src/Settings.cpp
             src/cube.cpp
-            src/teapot.cpp
+        src/Teapot.cpp
             src/lodepng.cpp
             src/shaderprogram.cpp
             src/model.cpp
-            src/main_file.cpp)
+            src/main_file.cpp
+            src/Drawable.cpp
+            src/Drawable.h)
 
 set(SHADERS shaders/fshader.glsl
             shaders/vshader.glsl)

@@ -27,27 +27,49 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //Culling GL_CW
 
 #include "model.h"
+#include "Drawable.h"
 
+class Teapot : public Drawable {
+ public:
+  Teapot();
+  Teapot(glm::mat4 modelMatrix);
+  Teapot(float x, float y, float z);
+  void move(float x, float y, float z);
+ private:
+  static ShaderProgram *shaderProgram;
+  static float *vertices;
+  static float *vertexNormals;
+  static const float *colors;
+  static const float *normals;
+  static const int vertexCount;
+ public:
+  static float *getVertices();
+  static float *getVertexNormals();
+  static const float *getColors();
+  static const float *getNormals();
+  static const int getVertexCount();
+  static void setShaderProgram(ShaderProgram *shaderProgram);
+};
+/*
 namespace Models {
-		
-	
-	namespace TeapotInternal {
-		extern float vertices[];
-		extern float normals[];
-		extern float vertexNormals[];
-		extern float texCoords[];
-		extern float colors[];
-		extern unsigned int vertexCount;
-	} 
- 
-	class Teapot: public Model {
-		public:
-			Teapot();			
-			virtual ~Teapot();
-			virtual void drawSolid();			
-	};
 
-	extern Teapot teapot;
-
+namespace TeapotInternal {
+extern float vertices[];
+extern float normals[];
+extern float vertexNormals[];
+extern float texCoords[];
+extern float colors[];
+extern unsigned int vertexCount;
 }
+
+class Teapot : public Model {
+ public:
+  Teapot();
+  virtual ~Teapot();
+  virtual void drawSolid();
+};
+
+extern Teapot teapot;
+
+}*/
 #endif

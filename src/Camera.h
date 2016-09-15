@@ -1,17 +1,15 @@
-/*
- * used for movement of player
- */
 
 #ifndef GRAFIKA_CAMERA_H
 #define GRAFIKA_CAMERA_H
-
 
 #include <GLFW/glfw3.h>
 #include <glm/vec3.hpp>
 #include <glm/detail/type_mat.hpp>
 #include "constants.h"
-#include "Settings.h"
 
+/**
+ * used for movement of player
+ **/
 class Camera { //camera singleton
  private:
   static Camera *instance;
@@ -29,13 +27,15 @@ class Camera { //camera singleton
   glm::mat4 perspectiveMatrix;
   glm::mat4 viewMatrix;
 
+  glm::mat4 _getPerspectiveMatrix();
+  glm::mat4 _getVievMatrix();
  public:
   static Camera *getInstance();
+  static glm::mat4 getPerspecitveMatrix();
+  static glm::mat4 getViewMatrix();
+
   static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
   void computeCamera(GLFWwindow *window, float deltaTime);
-
-  glm::mat4 getPerspectiveMatrix();
-  glm::mat4 getVievMatrix();
   void setMoveX(int moveX);
   void setMoveY(int moveY);
 };
