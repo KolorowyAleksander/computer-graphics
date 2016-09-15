@@ -61,6 +61,7 @@ void error_callback(int error, const char *description) {
 
 void add_drawing_objects() {
   Teapot teapot = Teapot();
+  teapot.setShaderProgram(new ShaderProgram("vshader.glsl", NULL, "fshader.glsl"));
   allDrawnObjects.push_back(teapot);
 }
 
@@ -82,9 +83,6 @@ void initOpenGLProgram(GLFWwindow *window) {
   glEnable(GL_DEPTH_TEST); //Turn on Z-Buffer
 
   glfwSetKeyCallback(window, Camera::key_callback);
-
-  //Read, compile and link the shader program
-  shaderProgram = new ShaderProgram("vshader.glsl", NULL, "fshader.glsl");
 
   //*****Proeparation for drawing of a single object*******
   //Build VBO buffers with object data
