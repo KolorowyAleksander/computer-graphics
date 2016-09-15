@@ -3,8 +3,10 @@
 #include <yaml-cpp/yaml.h>
 #include <GLFW/glfw3.h>
 
+/**
+ * loads settings from yaml and distributes them
+ **/
 class Settings {
-
  private:
   static Settings *instance;
   YAML::Node config;
@@ -24,7 +26,6 @@ class Settings {
   float getMouseSpeed();
 
   GLFWmonitor *getMonitorOrNull();
-
 };
 
 

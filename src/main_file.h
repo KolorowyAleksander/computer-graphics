@@ -1,7 +1,3 @@
-//
-// Created by a on 19.06.16.
-//
-
 #ifndef GRAFIKA_MAIN_FILE_H
 #define GRAFIKA_MAIN_FILE_H
 
