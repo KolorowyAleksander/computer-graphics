@@ -36,6 +36,7 @@ class Camera { //camera singleton
 
   glm::mat4 getPerspectiveMatrix();
   glm::mat4 getVievMatrix();
+  glm::vec3 getPosition();
   void setMoveX(int moveX);
   void setMoveY(int moveY);
 };

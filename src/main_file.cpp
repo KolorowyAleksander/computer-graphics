@@ -23,10 +23,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <glm/gtc/matrix_transform.hpp>
 #include <stdio.h>
 #include <iostream>
+#include <tiny_obj_loader.h>
 #include "allmodels.h"
 #include "shaderprogram.h"
 #include "main_file.h"
 #include "Camera.h"
+#include "tiny_obj_loader.h"
 #include "yaml-cpp/yaml.h"
 #include "Settings.h"
 
@@ -34,6 +36,8 @@ using namespace glm;
 
 //Shader program object
 ShaderProgram *shaderProgram;
+
+
 
 //VAO and VBO handles
 GLuint vao;
@@ -44,10 +48,10 @@ GLuint bufNormals; //handle for VBO buffer which stores vertex normals
 
 
 //Teapot
-float *vertices = Models::TeapotInternal::vertices;
-float *colors = Models::TeapotInternal::colors;
-float *normals = Models::TeapotInternal::vertexNormals;
-int vertexCount = Models::TeapotInternal::vertexCount;
+float *vertices = Models::CubeInternal::vertices;
+float *colors = Models::CubeInternal::colors;
+float *normals = Models::CubeInternal::normals;
+int vertexCount = Models::CubeInternal::vertexCount;
 
 //Error handling procedure
 void error_callback(int error, const char *description) {
@@ -58,6 +62,18 @@ void error_callback(int error, const char *description) {
 void initOpenGLProgram(GLFWwindow *window) {
   //************Insert initialization code here************
 
+  tinyobj::attrib_t attribs;
+  std::vector<tinyobj::shape_t> shapes;
+  std::vector<tinyobj::material_t> material;
+  std::string err;
+
+  if(!tinyobj::LoadObj(&attribs, &shapes, &material, &err, "cube.obj")){
+    exit(1);
+  } else if (!err.empty()) {
+    std::cout << err;
+    exit(1);
+  }
+
   //set cursor position to the middle of the window
   int xpos, ypos;
   glfwGetWindowSize(window, &xpos, &ypos);
@@ -65,7 +81,6 @@ void initOpenGLProgram(GLFWwindow *window) {
 
   //disable mouse cursor
   glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
-
 
   glClearColor(0, 0, 0, 1); //Clear the screen to black
   glEnable(GL_DEPTH_TEST); //Turn on Z-Buffer
@@ -79,9 +94,12 @@ void initOpenGLProgram(GLFWwindow *window) {
 
   //*****Proeparation for drawing of a single object*******
   //Build VBO buffers with object data
-  bufVertices = makeBuffer(vertices, vertexCount, sizeof(float) * 4); //VBO with vertex coordinates
-  bufColors = makeBuffer(colors, vertexCount, sizeof(float) * 4);//VBO with vertes colors
-  bufNormals = makeBuffer(normals, vertexCount, sizeof(float) * 4);//VBO with vertex normals
+
+  
+
+  bufVertices = makeBuffer(attribs.vertices.data(), attribs.vertices.size(), sizeof(float) * 4); //VBO with vertex coordinates
+  bufColors = makeBuffer(colors, attribs.normals.size(), sizeof(float) * 4);//VBO with vertes colors
+  bufNormals = makeBuffer(attribs.normals.data(), attribs.normals.size(), sizeof(float) * 4);//VBO with vertex normals
 
   //Create VAO which associates VBO with attributes in shading program
   glGenVertexArrays(1, &vao); //Generate VAO handle and store it in the global variable
@@ -133,12 +151,16 @@ void drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 mV, mat4
   glUniformMatrix4fv(shaderProgram->getUniformLocation("V"), 1, false, glm::value_ptr(mV));
   glUniformMatrix4fv(shaderProgram->getUniformLocation("M"), 1, false, glm::value_ptr(mM));
 
-  glUniform4f(shaderProgram->getUniformLocation("lightPos0"), 0, 0, 5, 1);
+  glUniform4f(shaderProgram->getUniformLocation("lightPos0"),
+              Camera::getInstance()->getPosition().x,
+              Camera::getInstance()->getPosition().y,
+              Camera::getInstance()->getPosition().z,
+              1);
 
   //Activation of VAO and therefore making all associations of VBOs and attributes current
   glBindVertexArray(vao);
 
-  //Drawing of an object
+  //Drawing of an object    
   glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
   //Tidying up after ourselves (not needed if we use VAO for every object)
@@ -157,8 +179,11 @@ void drawScene(GLFWwindow *window) {
   //Compute model matrix
   glm::mat4 M = glm::mat4(1.0f);
 
+  glm::mat4 M2 = glm::translate(M, glm::vec3(5.0f, 1.0f, -5.0f));
+
   //Draw object
   drawObject(vao, shaderProgram, P, V, M);
+  drawObject(vao, shaderProgram, P, V, M2);
 
   //Swap front and back buffers
   glfwSwapBuffers(window);
@@ -174,9 +199,9 @@ int main(void) {
     fprintf(stderr, "Can't initialize GLFW GLFW.\n");
     exit(EXIT_FAILURE);
   }
-  
-  std::cout<<Settings::getInstance()->getWindowHeight()<<": height"<<std::endl;
-  std::cout<<Settings::getInstance()->getWindowWidth()<<": width"<<std::endl;
+
+  std::cout << Settings::getInstance()->getWindowHeight() << ": height" << std::endl;
+  std::cout << Settings::getInstance()->getWindowWidth() << ": width" << std::endl;
 
   window = glfwCreateWindow(Settings::getInstance()->getWindowWidth(),
                             Settings::getInstance()->getWindowHeight(),

@@ -163,5 +163,8 @@ Camera::Camera() {
                                              1.0f,
                                              50.0f); // perspective matrix
 }
+glm::vec3 Camera::getPosition() {
+  return this->position;
+}
 
 //maybe constructor for any point in space would be nice?
