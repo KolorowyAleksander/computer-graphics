@@ -21,36 +21,30 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <stdio.h>
-#include <iostream>
 #include <tiny_obj_loader.h>
-#include "allmodels.h"
+
+#include <iostream>
+
 #include "shaderprogram.h"
+#include "allmodels.h"
 #include "main_file.h"
 #include "Camera.h"
-#include "tiny_obj_loader.h"
-#include "yaml-cpp/yaml.h"
-#include "Settings.h"
 
 using namespace glm;
 
 //Shader program object
 ShaderProgram *shaderProgram;
 
-
-
 //VAO and VBO handles
 GLuint vao;
-GLuint bufVertices; //handle for VBO buffer which stores vertex coordinates
-GLuint bufColors;  //handle for VBO buffer which stores vertex colors
-GLuint bufNormals; //handle for VBO buffer which stores vertex normals
+GLuint bufferVertices; //handle for VBO buffer which stores vertex coordinates
+GLuint bufferColors;  //handle for VBO buffer which stores vertex colors
+GLuint bufferNormals; //handle for VBO buffer which stores vertex normals
+GLuint bufferTextureCoordinates;
 
+GLuint texture;
+GLuint textureShine;
 
-
-//Teapot
-float *vertices = Models::CubeInternal::vertices;
-float *colors = Models::CubeInternal::colors;
-float *normals = Models::CubeInternal::normals;
 int vertexCount = Models::CubeInternal::vertexCount;
 
 //Error handling procedure
@@ -67,11 +61,11 @@ void initOpenGLProgram(GLFWwindow *window) {
   std::vector<tinyobj::material_t> material;
   std::string err;
 
-  if(!tinyobj::LoadObj(&attribs, &shapes, &material, &err, "cube.obj")){
+  if (!tinyobj::LoadObj(&attribs, &shapes, &material, &err, "wall.obj")) {
     exit(1);
   } else if (!err.empty()) {
     std::cout << err;
-    exit(1);
+    //exit(1);
   }
 
   //set cursor position to the middle of the window
@@ -90,32 +84,28 @@ void initOpenGLProgram(GLFWwindow *window) {
   std::cout << "Shading Language version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << "\n";
 
   shaderProgram = new ShaderProgram("vshader.glsl", NULL, "fshader.glsl"); //Read, compile and link the shader program
+  texture = readTexture("brickwall.png");
+  textureShine = readTexture("brickwall_contrast.png");
 
+  //*****Preparation for drawing of a single object*******
 
-  //*****Proeparation for drawing of a single object*******
-  //Build VBO buffers with object data
-
-  
-
-  bufVertices = makeBuffer(attribs.vertices.data(), attribs.vertices.size(), sizeof(float) * 4); //VBO with vertex coordinates
-  bufColors = makeBuffer(colors, attribs.normals.size(), sizeof(float) * 4);//VBO with vertes colors
-  bufNormals = makeBuffer(attribs.normals.data(), attribs.normals.size(), sizeof(float) * 4);//VBO with vertex normals
+  Models::Cube cube = Models::Cube();
+  bufferVertices = makeBuffer(cube.vertices, cube.vertexCount, sizeof(float) * 4); //VBO with vertex coordinates
+  bufferColors = makeBuffer(cube.colors, cube.vertexCount, sizeof(float) * 4);//VBO with vertes colors
+  bufferNormals = makeBuffer(cube.normals, cube.vertexCount, sizeof(float) * 4);
+  bufferTextureCoordinates = makeBuffer(cube.texCoords, cube.vertexCount, sizeof(float) * 2);
 
   //Create VAO which associates VBO with attributes in shading program
-  glGenVertexArrays(1, &vao); //Generate VAO handle and store it in the global variable
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
 
-  glBindVertexArray(vao); //Activate newly created VAO
-
-  assignVBOtoAttribute(shaderProgram, "vertex", bufVertices,
-                       4); //"vertex" refers to the declaration "in vec4 vertex;" in vertex shader
-  assignVBOtoAttribute(shaderProgram, "color", bufColors,
-                       4); //"color" refers to the declaration "in vec4 color;" in vertex shader
-  assignVBOtoAttribute(shaderProgram, "normal", bufNormals,
-                       4); //"normal" refers to the declaration "in vec4 normal;" w vertex shader
+  assignVBOtoAttribute(shaderProgram, "vertex", bufferVertices, 4);
+  assignVBOtoAttribute(shaderProgram, "color", bufferColors, 4);
+  assignVBOtoAttribute(shaderProgram, "normal", bufferNormals, 4);
+  assignVBOtoAttribute(shaderProgram, "inTextureCoordinates", bufferTextureCoordinates, 2);
 
   glBindVertexArray(0); //Deactivate VAO
   //******End of object preparation************
-
 }
 
 //Freeing of resources
@@ -124,41 +114,43 @@ void freeOpenGLProgram() {
 
   glDeleteVertexArrays(1, &vao); //Delete VAO
   //Delete VBOs
-  glDeleteBuffers(1, &bufVertices);
-  glDeleteBuffers(1, &bufColors);
-  glDeleteBuffers(1, &bufNormals);
+  glDeleteBuffers(1, &bufferVertices);
+  glDeleteBuffers(1, &bufferColors);
+  glDeleteBuffers(1, &bufferNormals);
+  glDeleteBuffers(1, &bufferTextureCoordinates);
 
+  //cleanup of singletons
   delete Camera::getInstance();
   delete Settings::getInstance();
 }
 
 void drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 mV, mat4 mM) {
-  //Turn on the shading program that will be used for drawing.
-  //While in this program it would be perfectly correct to execute this once in the initOpenGLProgram,
-  //in most cases more than one shading program is used and hence, it should be switched between drawing of objects
-  //while we render a single scene.
+  //Turn on the shading program that will be used for drawing. We use only one, so we do it only once.
   shaderProgram->use();
 
-  //Set uniform variables P,V and M in the vertex shader by assigning the appropriate matrices
-  //In the lines below, expression:
-  //  shaderProgram->getUniformLocation("P")
-  //Retrieves the slot number corresponding to a uniform variable of a given name.
-  //WARNING! "P" in the instruction above corresponds to the declaration "uniform mat4 P;" in the vertex shader,
-  //while mP in glm::value_ptr(mP) corresponds to the argument "mat4 mP;" in THIS file.
-  //The whole line below copies data from variable mP to the uniform variable P in the vertex shader.
-  // The rest of the instructions work similarly.
   glUniformMatrix4fv(shaderProgram->getUniformLocation("P"), 1, false, glm::value_ptr(mP));
   glUniformMatrix4fv(shaderProgram->getUniformLocation("V"), 1, false, glm::value_ptr(mV));
   glUniformMatrix4fv(shaderProgram->getUniformLocation("M"), 1, false, glm::value_ptr(mM));
 
-  glUniform4f(shaderProgram->getUniformLocation("lightPos0"),
-              Camera::getInstance()->getPosition().x,
-              Camera::getInstance()->getPosition().y,
-              Camera::getInstance()->getPosition().z,
-              1);
+  glUniform1i(shaderProgram->getUniformLocation("textureMap"), 0);
+  glUniform1i(shaderProgram->getUniformLocation("textureShineMap"), 0);
+
+  glUniform4f(
+      shaderProgram->getUniformLocation("lightPosition"),
+      Camera::getInstance()->getPosition().x,
+      Camera::getInstance()->getPosition().y,
+      Camera::getInstance()->getPosition().z,
+      1
+  );
 
   //Activation of VAO and therefore making all associations of VBOs and attributes current
   glBindVertexArray(vao);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, texture);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, textureShine);
 
   //Drawing of an object    
   glDrawArrays(GL_TRIANGLES, 0, vertexCount);
@@ -166,6 +158,19 @@ void drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 mV, mat4
   //Tidying up after ourselves (not needed if we use VAO for every object)
   glBindVertexArray(0);
 }
+
+int hardcodedMaze[10][11] = {
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+    {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1},
+    {1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1},
+    {1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
+    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+    {1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+};
 
 //Procedure which draws the scene
 void drawScene(GLFWwindow *window) {
@@ -177,14 +182,20 @@ void drawScene(GLFWwindow *window) {
   glm::mat4 V = Camera::getInstance()->getVievMatrix(); //get P and V matrices from camera singleton
 
   //Compute model matrix
-  glm::mat4 M = glm::mat4(1.0f);
+  glm::mat4 M;
+  for (int i = 0; i < 10; i++)
+    for (int j = 0; j < 11; j++) {
+      M = glm::mat4(1.0f);
 
-  glm::mat4 M2 = glm::translate(M, glm::vec3(5.0f, 1.0f, -5.0f));
+      //Draw object
+      if (hardcodedMaze[i][j] == 1) {
+        glm::mat4 Mb = glm::translate(M, glm::vec3(i * 2.0001f, 1.0f, 2.0001f * j));
+        drawObject(vao, shaderProgram, P, V, Mb);
+      }
 
-  //Draw object
-  drawObject(vao, shaderProgram, P, V, M);
-  drawObject(vao, shaderProgram, P, V, M2);
-
+      M = glm::translate(M, glm::vec3(i * 2.0001f, -1.0001f, 2.0001f * j));
+      drawObject(vao, shaderProgram, P, V, M);
+    }
   //Swap front and back buffers
   glfwSwapBuffers(window);
 

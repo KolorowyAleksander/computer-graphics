@@ -4,3 +4,9 @@
 
 #include "Maze.h"
 
+void Maze::generate() {
+  return;
+}
+void Maze::draw() {
+
+}

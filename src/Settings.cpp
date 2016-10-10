@@ -40,6 +40,13 @@ bool Settings::isFullscreen() {
 GLFWmonitor *Settings::getMonitorOrNull() {
   return isFullscreen() ? monitor : NULL;
 }
+glm::vec3 Settings::getStartingPoint() {
+  return glm::vec3(
+      config["settings"]["player"]["startingPoint"]["x"].as<float>(),
+      config["settings"]["player"]["startingPoint"]["y"].as<float>(),
+      config["settings"]["player"]["startingPoint"]["z"].as<float>()
+  );
+}
 
 
 

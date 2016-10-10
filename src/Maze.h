@@ -3,12 +3,13 @@
 
 
 class Maze {
-public:
-    void draw();
+ public:
+  void draw();
 
 private:
     float *array;
     void generate();
+
 };
 
 

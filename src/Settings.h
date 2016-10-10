@@ -2,6 +2,7 @@
 #define GRAFIKA_SETTINGS_H
 #include <yaml-cpp/yaml.h>
 #include <GLFW/glfw3.h>
+#include <glm/common.hpp>
 
 class Settings {
 
@@ -17,6 +18,7 @@ class Settings {
   static Settings *getInstance();
   int getWindowHeight();
   int getWindowWidth();
+  glm::vec3 getStartingPoint();
   GLFWmonitor *getMonitorOrNull();
 
 };

@@ -8,7 +8,6 @@
 #include "Camera.h"
 #include "Settings.h"
 
-
 Camera *Camera::instance(nullptr);
 
 //Key event processing procedure
@@ -16,20 +15,15 @@ void Camera::key_callback(GLFWwindow *window, int key, int scancode, int action,
   Camera *camera = Camera::getInstance();
   if (action == GLFW_PRESS) {
     switch (key) {
-      case GLFW_KEY_W:
-        camera->setMoveX(1);
+      case GLFW_KEY_W:camera->setMoveX(1);
         break;
-      case GLFW_KEY_S:
-        camera->setMoveX(-1);
+      case GLFW_KEY_S:camera->setMoveX(-1);
         break;
-      case GLFW_KEY_A:
-        camera->setMoveY(-1);
+      case GLFW_KEY_A:camera->setMoveY(-1);
         break;
-      case GLFW_KEY_D:
-        camera->setMoveY(1);
+      case GLFW_KEY_D:camera->setMoveY(1);
         break;
-      case GLFW_KEY_ESCAPE:
-        glfwSetWindowShouldClose(window, 1);
+      case GLFW_KEY_ESCAPE:glfwSetWindowShouldClose(window, 1);
         /* case (GLFW_KEY_LEFT_CONTROL && GLFW_KEY_F): {
            int widthMM, heightMM;
            GLFWmonitor *monitor = glfwGetPrimaryMonitor();
@@ -59,27 +53,21 @@ void Camera::key_callback(GLFWwindow *window, int key, int scancode, int action,
            }
            std::cout<<"ctrl+f"<<std::endl;
          }*/
-      default:
-        break;
+      default:break;
     }
   }
 
   if (action == GLFW_RELEASE) {
     switch (key) {
-      case GLFW_KEY_W:
-        camera->setMoveX(0);
+      case GLFW_KEY_W:camera->setMoveX(0);
         break;
-      case GLFW_KEY_S:
-        camera->setMoveX(0);
+      case GLFW_KEY_S:camera->setMoveX(0);
         break;
-      case GLFW_KEY_A:
-        camera->setMoveY(0);
+      case GLFW_KEY_A:camera->setMoveY(0);
         break;
-      case GLFW_KEY_D:
-        camera->setMoveY(0);
+      case GLFW_KEY_D:camera->setMoveY(0);
         break;
-      default:
-        break;
+      default:break;
     }
   }
 }
@@ -136,7 +124,6 @@ void Camera::setMoveY(int moveY) {
   Camera::moveY = moveY;
 }
 
-//default starting point is -5.0f actually
 Camera::Camera() {
   this->moveX = 0;
   this->moveY = 0;
@@ -144,7 +131,7 @@ Camera::Camera() {
   this->verticalSightAngle = 0.0f;
   this->moveSpeed = 3.0f;
   this->mouseSpeed = 0.1f;
-  this->position = glm::vec3(0.0f, 0.0f, 5.0f);
+  this->position = Settings::getInstance()->getStartingPoint();
 
   this->direction = glm::vec3(cos(verticalSightAngle) * sin(horizontalSightAngle),
                               sin(verticalSightAngle),
@@ -161,7 +148,7 @@ Camera::Camera() {
                                              (float) Settings::getInstance()->getWindowWidth()
                                                  / Settings::getInstance()->getWindowHeight(),
                                              1.0f,
-                                             50.0f); // perspective matrix
+                                             150.0f); // perspective matrix
 }
 glm::vec3 Camera::getPosition() {
   return this->position;
