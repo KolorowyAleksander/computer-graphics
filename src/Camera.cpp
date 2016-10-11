@@ -7,6 +7,8 @@
 #include <iostream>
 #include "Camera.h"
 
+const float PI = 3.141592653589793f;
+
 Camera *Camera::instance(nullptr);
 
 //Key event processing procedure
@@ -70,6 +72,7 @@ void Camera::computeCamera(GLFWwindow *window, float deltaTime, std::vector<glm:
   double xpos, ypos; // mouse position in x and y axis
   glfwGetCursorPos(window, &xpos, &ypos);
   glfwSetCursorPos(window, double(windowWidth / 2), double(windowHeight / 2));
+
 
   this->horizontalSightAngle += mouseSpeed * deltaTime * (windowWidth / 2 - xpos);
   this->verticalSightAngle += mouseSpeed * deltaTime * (windowHeight / 2 - ypos);

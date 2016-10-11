@@ -9,7 +9,6 @@
 #include <GLFW/glfw3.h>
 #include <glm/vec3.hpp>
 #include <glm/detail/type_mat.hpp>
-#include "constants.h"
 #include "Settings.h"
 
 class Camera { //camera singleton

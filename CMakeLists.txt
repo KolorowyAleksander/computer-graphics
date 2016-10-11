@@ -1,11 +1,6 @@
 cmake_minimum_required(VERSION 3.5)
 project(grafika)
 
-#include tinyobjectloader
-include_directories(lib)
-
-#set(TINY_LIBRARIES libtinyobjloader.a)
-
 #to squelch the casting from char* to const char*
 set(CMAKE_CXX_FLAGS "-Wno-write-strings -std=c++11")
 
@@ -15,22 +10,18 @@ set(SETTINGS settings.yaml)
 #set source .cpp files to compile
 set(SOURCES src/Maze.cpp
             src/Maze.h
-            src/allmodels.h
-            src/Camera.cpp
+        src/Camera.cpp
             src/Settings.cpp
-            src/cube.cpp
-            src/teapot.cpp
-            src/lodepng.cpp
-            src/shaderprogram.cpp
-            src/model.cpp
-            src/main_file.cpp)
+        src/shaderprogram.cpp
+        src/main_file.cpp)
 
 set(SHADERS shaders/fshader.glsl
             shaders/vshader.glsl)
 
 set(RESOURCES res/brickwall.png)
 
-set(OBJECTS obj/wall.obj)
+set(LIBS lib/lodepng.h
+         lib/lodepng.cpp)
 
 #find opengl main package end include headers if found
 find_package(OpenGL REQUIRED)
@@ -73,7 +64,7 @@ else ()
 endif ()
 
 #set source .cpp files for compilation
-set(ALL_FILES ${SOURCES})
+set(ALL_FILES ${SOURCES} ${LIBS} src/Cube.cpp src/Cube.h)
 
 #add target for compilation
 add_executable(grafika ${ALL_FILES})
@@ -94,14 +85,8 @@ add_custom_command(TARGET grafika POST_BUILD
                                                               $<TARGET_FILE_DIR:grafika>
                    COMMENT "Copying resources to build target directory")
 
-add_custom_command(TARGET grafika POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/obj
-                                                              $<TARGET_FILE_DIR:grafika>
-                   COMMENT "Copying resources to build target directory")
-
 #link all needed libraries against the object files
 target_link_libraries(grafika ${OPENGL_LIBRARIES})
 target_link_libraries(grafika ${GLEW_LIBRARIES})
 target_link_libraries(grafika glfw)
 target_link_libraries(grafika ${YAML_CPP_LIBRARIES})
-#target_link_libraries(grafika ${TINY_LIBRARIES})
