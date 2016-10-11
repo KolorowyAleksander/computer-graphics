@@ -14,41 +14,30 @@ void Camera::key_callback(GLFWwindow *window, int key, int scancode, int action,
   Camera *camera = Camera::getInstance();
   if (action == GLFW_PRESS) {
     switch (key) {
-      case GLFW_KEY_W:
-        camera->setMoveX(1);
+      case GLFW_KEY_W:camera->setMoveX(1);
         break;
-      case GLFW_KEY_S:
-        camera->setMoveX(-1);
+      case GLFW_KEY_S:camera->setMoveX(-1);
         break;
-      case GLFW_KEY_A:
-        camera->setMoveY(-1);
+      case GLFW_KEY_A:camera->setMoveY(-1);
         break;
-      case GLFW_KEY_D:
-        camera->setMoveY(1);
+      case GLFW_KEY_D:camera->setMoveY(1);
         break;
-      case GLFW_KEY_ESCAPE:
-        glfwSetWindowShouldClose(window, 1);
-      default:
-        break;
+      case GLFW_KEY_ESCAPE:glfwSetWindowShouldClose(window, 1);
+      default:break;
     }
   }
 
   if (action == GLFW_RELEASE) {
     switch (key) {
-      case GLFW_KEY_W:
-        camera->setMoveX(0);
+      case GLFW_KEY_W:camera->setMoveX(0);
         break;
-      case GLFW_KEY_S:
-        camera->setMoveX(0);
+      case GLFW_KEY_S:camera->setMoveX(0);
         break;
-      case GLFW_KEY_A:
-        camera->setMoveY(0);
+      case GLFW_KEY_A:camera->setMoveY(0);
         break;
-      case GLFW_KEY_D:
-        camera->setMoveY(0);
+      case GLFW_KEY_D:camera->setMoveY(0);
         break;
-      default:
-        break;
+      default:break;
     }
   }
 }
@@ -95,14 +84,15 @@ void Camera::computeCamera(GLFWwindow *window, float deltaTime, std::vector<glm:
 
   this->up = glm::cross(right, direction);
 
-  bool b = checkCollision(glm::vec4(this->position, 1), vector);
+  glm::vec3 nextPosition = this->position;
 
-  if (!b) {
-    this->position.x += direction.x * deltaTime * moveSpeed * (float) this->moveX;
-    this->position.z += direction.z * deltaTime * moveSpeed * (float) this->moveX;
-    this->position += right * deltaTime * moveSpeed * (float) this->moveY;
+  nextPosition.x += direction.x * deltaTime * moveSpeed * (float) this->moveX;
+  nextPosition.z += direction.z * deltaTime * moveSpeed * (float) this->moveX;
+  nextPosition += right * deltaTime * moveSpeed * (float) this->moveY;
+
+  if (!checkCollision(glm::vec4(nextPosition, 1), vector)) {
+    this->position = nextPosition;
   }
-
 
   this->viewMatrix = glm::lookAt(position, position + direction, up);
 }
