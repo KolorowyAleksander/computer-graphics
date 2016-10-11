@@ -40,37 +40,14 @@ bool Settings::isFullscreen() {
 GLFWmonitor *Settings::getMonitorOrNull() {
   return isFullscreen() ? monitor : NULL;
 }
-float Settings::getMouseSpeed() {
-  return config["settings"]["player"]["mouse speed"].as<float>();
+
+glm::vec3 Settings::getStartingPoint() {
+  return glm::vec3(
+      config["settings"]["player"]["startingPoint"]["x"].as<float>(),
+      config["settings"]["player"]["startingPoint"]["y"].as<float>(),
+      config["settings"]["player"]["startingPoint"]["z"].as<float>()
+  );
 }
-float Settings::getMoveSpeed() {
-  return config["settings"]["player"]["move speed"].as<float>();
-}
-float Settings::getStartingPointX() {
-  return config["settings"]["player"]["starting point"]["x"].as<float>();
-}
-float Settings::getStartingPointY() {
-  return config["settings"]["player"]["starting point"]["y"].as<float>();
-}
-float Settings::getStartingPointZ() {
-  return config["settings"]["player"]["starting point"]["z"].as<float>();
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

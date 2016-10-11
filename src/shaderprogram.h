@@ -21,21 +21,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "stdio.h"
 
 class ShaderProgram {
-private:
-	GLuint shaderProgram; //Shader program handle
-	GLuint vertexShader; //Vertex shader handle
-	GLuint geometryShader; //Geometry shader handle
-	GLuint fragmentShader; //Fragment shader handle
-	char * readFile(char* fileName); //File reading method
-	GLuint loadShader(GLenum shaderType,char* fileName); //Method reads shader source file, compiles it and returns the corresponding handle
-public:
-	ShaderProgram(char* vertexShaderFile,char* geometryShaderFile,char* fragmentShaderFile);
-	~ShaderProgram();
-	void use(); //Turns on the shader program
-	GLuint getUniformLocation(char* variableName); //Returns the slot number corresponding to the uniform variableName
-	GLuint getAttribLocation(char* variableName); //Returns the slot number corresponding to the attribute variableName
+ private:
+  GLuint shaderProgram; //Shader program handle
+  GLuint vertexShader; //Vertex shader handle
+  GLuint geometryShader; //Geometry shader handle
+  GLuint fragmentShader; //Fragment shader handle
+  char *readFile(char *fileName); //File reading method
+  GLuint loadShader(GLenum shaderType,
+                    char *fileName); //Method reads shader source file, compiles it and returns the corresponding handle
+ public:
+  ShaderProgram(char *vertexShaderFile, char *geometryShaderFile, char *fragmentShaderFile);
+  ~ShaderProgram();
+  void use(); //Turns on the shader program
+  GLuint getUniformLocation(char *variableName); //Returns the slot number corresponding to the uniform variableName
+  GLuint getAttribLocation(char *variableName); //Returns the slot number corresponding to the attribute variableName
 };
-
-
 
 #endif

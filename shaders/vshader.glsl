@@ -5,25 +5,34 @@ uniform mat4 P;
 uniform mat4 V;
 uniform mat4 M;
 
-uniform vec4 lightPos0; //Light coordinates in world space
+uniform vec4 lightPosition;
+uniform vec4 lightDirection;
 
-//Attributes
-in vec4 vertex; //vertex coordinates in model space
-in vec4 color;  //vertex color
-in vec4 normal; //vertex normal
+in vec4 vertex;
+in vec4 color;
+in vec4 normal;
+in vec2 inTextureCoordinates;
 
-//Zmienne interpolowane
-out vec4 vN; //interpolated normal vector in the eye space
-out vec4 vV; //interpolated viewer vector in the eye space
-out vec4 vL; //interpolated light vector in the eye space
-out vec4 iC; //interpolated vertex color
+
+out vec4 vN;
+out vec4 vV;
+out vec4 vL;
+out vec4 lightRayWorldSpace;
+out vec4 vertexPosWorldSpace;
+out vec4 lightDir;
+out float distance;
+out vec2 textureCoordinates;
 
 void main(void) {
 	gl_Position=P*V*M*vertex; //Compute vertex coordinates in the clip space
 
-	vN=normalize(V*M*normal); //Compute and interpolate normal vector in the eye space
-	vL=normalize(V*lightPos0-V*M*vertex); //Compute and interpolate viewer vector in the eye space
-	vV=normalize(vec4(0,0,0,1)-V*M*vertex); //Compute and interpolate light vector in the eye space
+    distance = length(lightPosition - M * vertex);
+    lightRayWorldSpace = normalize(lightPosition - M*vertex);
+    lightDir = normalize(lightDirection - lightPosition);
 
-	iC=color; //Interpolate vertex color
+	vN=normalize(V*M*normal);
+	vL=normalize(V*lightPosition-V*M*vertex); //pointing from light to fragment
+	vV=normalize(V*M*vertex - V*lightPosition); //pointing from fragment to light
+
+    textureCoordinates = inTextureCoordinates;
 }

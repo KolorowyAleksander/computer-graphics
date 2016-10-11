@@ -10,21 +10,18 @@ set(SETTINGS settings.yaml)
 #set source .cpp files to compile
 set(SOURCES src/Maze.cpp
             src/Maze.h
-            src/allmodels.h
-            src/Camera.cpp
+        src/Camera.cpp
             src/Settings.cpp
-            src/cube.cpp
-            src/teapot.cpp
-            src/lodepng.cpp
-            src/shaderprogram.cpp
-            src/model.cpp
-            src/main_file.cpp)
+        src/shaderprogram.cpp
+        src/main_file.cpp)
 
 set(SHADERS shaders/fshader.glsl
             shaders/vshader.glsl)
 
-set(RESOURCES res/stones.png)
+set(RESOURCES res/brickwall.png)
 
+set(LIBS lib/lodepng.h
+         lib/lodepng.cpp)
 
 #find opengl main package end include headers if found
 find_package(OpenGL REQUIRED)
@@ -58,10 +55,7 @@ else ()
     message("YAML not found")
 endif ()
 
-
-#change module path to project to include FindGLFW.cmake
 #find GLFW3 library and include headers if found
-#set(CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR})
 find_package(glfw3 3.2 REQUIRED)
 if (GLFW_FOUND)
     include_directories(${GLFW_INCLUDE_DIR})
@@ -70,7 +64,7 @@ else ()
 endif ()
 
 #set source .cpp files for compilation
-set(ALL_FILES ${SOURCES} ${SHADERS} ${RESOURCES} ${SETTINGS})
+set(ALL_FILES ${SOURCES} ${LIBS} src/Cube.cpp src/Cube.h)
 
 #add target for compilation
 add_executable(grafika ${ALL_FILES})
@@ -87,7 +81,7 @@ add_custom_command(TARGET grafika POST_BUILD
                    COMMENT "Copying shaders to build target directory: $<TARGET_FILE_DIR:grafika>")
 
 add_custom_command(TARGET grafika POST_BUILD
-                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/resources
+                   COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res
                                                               $<TARGET_FILE_DIR:grafika>
                    COMMENT "Copying resources to build target directory")
 
