@@ -46,16 +46,28 @@ void assignVBOtoAttribute(ShaderProgram *shaderProgram, char *attributeName, GLu
 std::vector<glm::mat4> calculateMaze(std::vector<std::vector<int>> hardcodedMaze) {
   std::vector<glm::mat4> vector;
   glm::mat4 M = glm::mat4(1.0f);
-  for (int i = 0; i < hardcodedMaze.size(); i++)
+  for (int i = 0; i < hardcodedMaze.size(); i++) {
     for (int j = 0; j < hardcodedMaze[i].size(); j++) {
-      //Draw object
       if (hardcodedMaze[i][j] == 1) {
         vector.push_back(glm::translate(M, glm::vec3(i * 2.0001f, 1.0f, 2.0001f * j)));
-      } else {
+      }
+    }
+  }
+  return vector;
+}
+
+std::vector<glm::mat4> calculateFloor(std::vector<std::vector<int>> hardcodedMaze) {
+  std::vector<glm::mat4> vector;
+  glm::mat4 M = glm::mat4(1.0f);
+  for (int i = 0; i < hardcodedMaze.size(); i++) {
+    for (int j = 0; j < hardcodedMaze[i].size(); j++) {
+      if (hardcodedMaze[i][j] == 0) {
         vector.push_back(glm::translate(M, glm::vec3(i * 2.0001f, -1.0001f, 2.0001f * j)));
         vector.push_back(glm::translate(M, glm::vec3(i * 2.0001f, 3.0001f, 2.0001f * j)));
       }
     }
+  }
+
   return vector;
 }
 #endif //GRAFIKA_MAIN_FILE_H

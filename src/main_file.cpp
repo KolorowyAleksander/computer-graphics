@@ -61,6 +61,7 @@ std::vector<std::vector<int>> hardcodedMaze = {
 };
 
 std::vector<glm::mat4> cubeModelVectors = calculateMaze(hardcodedMaze);
+std::vector<glm::mat4> floorModelVectors = calculateFloor(hardcodedMaze);
 
 //Error handling procedure
 void error_callback(int error, const char *description) {
@@ -71,17 +72,17 @@ void error_callback(int error, const char *description) {
 void initOpenGLProgram(GLFWwindow *window) {
   //************Insert initialization code here************
 
-  tinyobj::attrib_t attribs;
-  std::vector<tinyobj::shape_t> shapes;
-  std::vector<tinyobj::material_t> material;
-  std::string err;
-
-  if (!tinyobj::LoadObj(&attribs, &shapes, &material, &err, "wall.obj")) {
-    exit(1);
-  } else if (!err.empty()) {
-    std::cout << err;
-    //exit(1);
-  }
+//  tinyobj::attrib_t attribs;
+//  std::vector<tinyobj::shape_t> shapes;
+//  std::vector<tinyobj::material_t> material;
+//  std::string err;
+//
+//  if (!tinyobj::LoadObj(&attribs, &shapes, &material, &err, "wall.obj")) {
+//    exit(1);
+//  } else if (!err.empty()) {
+//    std::cout << err;
+//    //exit(1);
+//  }
 
   //set cursor position to the middle of the window
   int xpos, ypos;
@@ -113,6 +114,7 @@ void initOpenGLProgram(GLFWwindow *window) {
   //Create VAO which associates VBO with attributes in shading program
   glGenVertexArrays(1, &vao);
   glBindVertexArray(vao);
+
 
   assignVBOtoAttribute(shaderProgram, "vertex", bufferVertices, 4);
   assignVBOtoAttribute(shaderProgram, "color", bufferColors, 4);
@@ -196,6 +198,9 @@ void drawScene(GLFWwindow *window) {
     drawObject(vao, shaderProgram, P, V, matrix);
   }
 
+  for(auto matrix : floorModelVectors) {
+    drawObject(vao, shaderProgram, P, V, matrix);
+  }
   //Swap front and back buffers
   glfwSwapBuffers(window);
 
@@ -242,10 +247,11 @@ int main(void) {
   //Main loop
   while (!glfwWindowShouldClose(window)) {
     deltaTime = glfwGetTime();
-    Camera::getInstance()->computeCamera(window, (float) deltaTime);
+    Camera::getInstance()->computeCamera(window, (float) deltaTime, cubeModelVectors);
     glfwSetTime(0); //Zero time counter
     drawScene(window); //Execute drawing procedure
     glfwPollEvents(); //Execute callback procedures which process events
+
   }
 
   freeOpenGLProgram(); //Free resources

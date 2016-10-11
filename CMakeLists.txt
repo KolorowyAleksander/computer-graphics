@@ -4,7 +4,7 @@ project(grafika)
 #include tinyobjectloader
 include_directories(lib)
 
-set(TINY_LIBRARIES libtinyobjloader.a)
+#set(TINY_LIBRARIES libtinyobjloader.a)
 
 #to squelch the casting from char* to const char*
 set(CMAKE_CXX_FLAGS "-Wno-write-strings -std=c++11")
@@ -104,4 +104,4 @@ target_link_libraries(grafika ${OPENGL_LIBRARIES})
 target_link_libraries(grafika ${GLEW_LIBRARIES})
 target_link_libraries(grafika glfw)
 target_link_libraries(grafika ${YAML_CPP_LIBRARIES})
-target_link_libraries(grafika ${TINY_LIBRARIES})
+#target_link_libraries(grafika ${TINY_LIBRARIES})

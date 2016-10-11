@@ -32,7 +32,7 @@ class Camera { //camera singleton
  public:
   static Camera *getInstance();
   static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods);
-  void computeCamera(GLFWwindow *window, float deltaTime);
+  void computeCamera(GLFWwindow *window, float deltaTime, std::vector<glm::mat4> vector);
 
   glm::mat4 getPerspectiveMatrix();
   glm::mat4 getVievMatrix();
@@ -40,6 +40,7 @@ class Camera { //camera singleton
   glm::vec3 getDirection();
   void setMoveX(int moveX);
   void setMoveY(int moveY);
+  bool checkCollision(glm::vec4 position, std::vector<glm::mat4> vector);
 };
 
 
