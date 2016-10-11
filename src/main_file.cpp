@@ -47,6 +47,21 @@ GLuint textureShine;
 
 int vertexCount = Models::CubeInternal::vertexCount;
 
+std::vector<std::vector<int>> hardcodedMaze = {
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+    {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
+    {1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1},
+    {1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1},
+    {1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
+    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
+    {1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+};
+
+std::vector<glm::mat4> cubeModelVectors = calculateMaze(hardcodedMaze);
+
 //Error handling procedure
 void error_callback(int error, const char *description) {
   fputs(description, stderr);
@@ -134,6 +149,15 @@ void drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 mV, mat4
 
   glUniform1i(shaderProgram->getUniformLocation("textureMap"), 0);
   glUniform1i(shaderProgram->getUniformLocation("textureShineMap"), 0);
+  glUniform1f(shaderProgram->getUniformLocation("cutoffAngle"), glm::cos(glm::radians(12.5f)));
+
+  glUniform4f(
+      shaderProgram->getUniformLocation("lightDirection"),
+      Camera::getInstance()->getDirection().x,
+      Camera::getInstance()->getDirection().y,
+      Camera::getInstance()->getDirection().z,
+      1
+  );
 
   glUniform4f(
       shaderProgram->getUniformLocation("lightPosition"),
@@ -152,25 +176,12 @@ void drawObject(GLuint vao, ShaderProgram *shaderProgram, mat4 mP, mat4 mV, mat4
   glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, textureShine);
 
-  //Drawing of an object    
+  //Drawing of an object
   glDrawArrays(GL_TRIANGLES, 0, vertexCount);
 
   //Tidying up after ourselves (not needed if we use VAO for every object)
   glBindVertexArray(0);
 }
-
-int hardcodedMaze[10][11] = {
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
-    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-    {1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1},
-    {1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1},
-    {1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1},
-    {1, 0, 1, 0, 1, 1, 1, 0, 0, 1, 1},
-    {1, 0, 1, 0, 1, 0, 0, 0, 1, 0, 1},
-    {1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1},
-    {1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 1},
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
-};
 
 //Procedure which draws the scene
 void drawScene(GLFWwindow *window) {
@@ -181,21 +192,10 @@ void drawScene(GLFWwindow *window) {
   glm::mat4 P = Camera::getInstance()->getPerspectiveMatrix();
   glm::mat4 V = Camera::getInstance()->getVievMatrix(); //get P and V matrices from camera singleton
 
-  //Compute model matrix
-  glm::mat4 M;
-  for (int i = 0; i < 10; i++)
-    for (int j = 0; j < 11; j++) {
-      M = glm::mat4(1.0f);
+  for(auto matrix : cubeModelVectors) {
+    drawObject(vao, shaderProgram, P, V, matrix);
+  }
 
-      //Draw object
-      if (hardcodedMaze[i][j] == 1) {
-        glm::mat4 Mb = glm::translate(M, glm::vec3(i * 2.0001f, 1.0f, 2.0001f * j));
-        drawObject(vao, shaderProgram, P, V, Mb);
-      }
-
-      M = glm::translate(M, glm::vec3(i * 2.0001f, -1.0001f, 2.0001f * j));
-      drawObject(vao, shaderProgram, P, V, M);
-    }
   //Swap front and back buffers
   glfwSwapBuffers(window);
 
