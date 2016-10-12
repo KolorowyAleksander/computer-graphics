@@ -70,17 +70,17 @@ set(ALL_FILES ${SOURCES} ${LIBS} src/Cube.cpp src/Cube.h src/Main.cpp src/Main.h
 add_executable(grafika ${ALL_FILES})
 
 
-add_custom_command(TARGET grafika POST_BUILD
+add_custom_command(TARGET grafika PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_SOURCE_DIR}/${SETTINGS}
                                                                  $<TARGET_FILE_DIR:grafika>
                    COMMENT "Copying settings file to build target directory")
 
-add_custom_command(TARGET grafika POST_BUILD
+add_custom_command(TARGET grafika PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/shaders
                                                               $<TARGET_FILE_DIR:grafika>
                    COMMENT "Copying shaders to build target directory: $<TARGET_FILE_DIR:grafika>")
 
-add_custom_command(TARGET grafika POST_BUILD
+add_custom_command(TARGET grafika PRE_BUILD
                    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/res
                                                               $<TARGET_FILE_DIR:grafika>
                    COMMENT "Copying resources to build target directory")

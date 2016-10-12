@@ -1,7 +1,3 @@
-//
-// Created by a on 12.10.16.
-//
-
 #ifndef GRAFIKA_CUBE_H
 #define GRAFIKA_CUBE_H
 
