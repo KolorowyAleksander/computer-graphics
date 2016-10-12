@@ -44,6 +44,7 @@ void Camera::key_callback(GLFWwindow *window, int key, int scancode, int action,
   }
 }
 
+//checks if player is trying to step into something
 bool Camera::checkCollision(glm::vec4 position, std::vector<glm::mat4> vector) {
 
   float boxLength = 0.35f;
@@ -55,6 +56,7 @@ bool Camera::checkCollision(glm::vec4 position, std::vector<glm::mat4> vector) {
     glm::vec4 b = m * glm::vec4(-1.0f, 0.0f, -1.0f, 1.0f);
     glm::vec4 B = m * glm::vec4(1.0f, 0.0f, 1.0f, 1.0f);
 
+    //very simple AABB collision detection in 2d
     if (!(A.x < b.x || B.x < a.x || A.z < b.z || B.z < a.z)) {
       return true;
     }
@@ -69,34 +71,45 @@ void Camera::computeCamera(GLFWwindow *window, float deltaTime, std::vector<glm:
   glfwGetWindowSize(window, &windowWidth, &windowHeight);
 
   /* this part measures the mouse movement in both x and y axis on the screen */
-  double xpos, ypos; // mouse position in x and y axis
+  double xpos, ypos;
   glfwGetCursorPos(window, &xpos, &ypos);
   glfwSetCursorPos(window, double(windowWidth / 2), double(windowHeight / 2));
-
 
   this->horizontalSightAngle += mouseSpeed * deltaTime * (windowWidth / 2 - xpos);
   this->verticalSightAngle += mouseSpeed * deltaTime * (windowHeight / 2 - ypos);
 
-  this->direction = glm::vec3(cos(Camera::verticalSightAngle) * sin(Camera::horizontalSightAngle),
-                              sin(Camera::verticalSightAngle),
-                              cos(Camera::verticalSightAngle) * cos(Camera::horizontalSightAngle));
+  this->direction =
+      glm::vec3(
+          cos(Camera::verticalSightAngle) * sin(Camera::horizontalSightAngle),
+          sin(Camera::verticalSightAngle),
+          cos(Camera::verticalSightAngle) * cos(Camera::horizontalSightAngle)
+      );
 
-  glm::vec3 right = glm::vec3(sin(horizontalSightAngle - PI / 2.0f),
-                              0,
-                              cos(horizontalSightAngle - PI / 2.0f));
 
+  //"right" vector to easily computate up vector
+  glm::vec3 right =
+      glm::vec3(
+          sin(horizontalSightAngle - PI / 2.0f),
+          0,
+          cos(horizontalSightAngle - PI / 2.0f)
+      );
+
+  //up is cross product of direction and right vector
   this->up = glm::cross(right, direction);
 
   glm::vec3 nextPosition = this->position;
 
+  //see next frame position
   nextPosition.x += direction.x * deltaTime * moveSpeed * (float) this->moveX;
   nextPosition.z += direction.z * deltaTime * moveSpeed * (float) this->moveX;
   nextPosition += right * deltaTime * moveSpeed * (float) this->moveY;
 
+  //check for collision - move is 'cancelled' if something's in the way
   if (!checkCollision(glm::vec4(nextPosition, 1), vector)) {
     this->position = nextPosition;
   }
 
+  //calculate viewmatrix
   this->viewMatrix = glm::lookAt(position, position + direction, up);
 }
 
@@ -131,23 +144,31 @@ Camera::Camera() {
   this->mouseSpeed = 0.1f;
   this->position = Settings::getInstance()->getStartingPoint();
 
+  this->direction =
+      glm::vec3(
+          cos(verticalSightAngle) * sin(horizontalSightAngle),
+          sin(verticalSightAngle),
+          cos(verticalSightAngle) * cos(horizontalSightAngle)
+      );
 
-  this->direction = glm::vec3(cos(verticalSightAngle) * sin(horizontalSightAngle),
-                              sin(verticalSightAngle),
-                              cos(verticalSightAngle) * cos(horizontalSightAngle));
-
-  glm::vec3 right = glm::vec3(sin(horizontalSightAngle - PI / 2.0f),
-                              0,
-                              cos(horizontalSightAngle - PI / 2.0f));
+  glm::vec3 right =
+      glm::vec3(
+          sin(horizontalSightAngle - PI / 2.0f),
+          0,
+          cos(horizontalSightAngle - PI / 2.0f)
+      );
 
   this->up = glm::cross(right, direction);
 
   this->viewMatrix = glm::lookAt(position, position + direction, up);
-  this->perspectiveMatrix = glm::perspective(40.0f * PI / 180,
-                                             (float) Settings::getInstance()->getWindowWidth()
-                                                 / Settings::getInstance()->getWindowHeight(),
-                                             0.25f,
-                                             150.0f); // perspective matrix
+  this->perspectiveMatrix =
+      glm::perspective(
+          45.0f * PI / 180,
+          (float) Settings::getInstance()->getWindowWidth()
+              / Settings::getInstance()->getWindowHeight(),
+          0.25f, //really close clipping so we don't see inside walls
+          150.0f
+      );
 }
 glm::vec3 Camera::getPosition() {
   return this->position;
@@ -155,5 +176,3 @@ glm::vec3 Camera::getPosition() {
 glm::vec3 Camera::getDirection() {
   return this->direction;
 }
-
-//maybe constructor for any point in space would be nice?

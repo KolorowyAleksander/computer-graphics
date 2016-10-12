@@ -1,6 +1,6 @@
 #include <iostream>
 #include <fstream>
-#include "shaderprogram.h"
+#include "ShaderProgram.h"
 
 //Procedure reads a file into an array of chars
 char *ShaderProgram::readFile(char *fileName) {

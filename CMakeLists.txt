@@ -10,13 +10,13 @@ set(SETTINGS settings.yaml)
 #set source .cpp files to compile
 set(SOURCES src/Maze.cpp
             src/Maze.h
-        src/Camera.cpp
+            src/Camera.cpp
             src/Settings.cpp
-        src/shaderprogram.cpp
-        src/main_file.cpp)
+            src/ShaderProgram.cpp
+        src/main.cpp)
 
-set(SHADERS shaders/fshader.glsl
-            shaders/vshader.glsl)
+set(SHADERS shaders/wallFragmentShader.glsl
+        shaders/wallVertexShader.glsl)
 
 set(RESOURCES res/brickwall.png)
 
@@ -64,7 +64,7 @@ else ()
 endif ()
 
 #set source .cpp files for compilation
-set(ALL_FILES ${SOURCES} ${LIBS} src/Cube.cpp src/Cube.h)
+set(ALL_FILES ${SOURCES} ${LIBS} src/Cube.cpp src/Cube.h src/Main.cpp src/Main.h)
 
 #add target for compilation
 add_executable(grafika ${ALL_FILES})

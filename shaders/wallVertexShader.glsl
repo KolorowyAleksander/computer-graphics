@@ -24,15 +24,15 @@ out float distance;
 out vec2 textureCoordinates;
 
 void main(void) {
-	gl_Position=P*V*M*vertex; //Compute vertex coordinates in the clip space
+	gl_Position=P*V*M*vertex;
 
     distance = length(lightPosition - M * vertex);
     lightRayWorldSpace = normalize(lightPosition - M*vertex);
     lightDir = normalize(lightDirection - lightPosition);
 
 	vN=normalize(V*M*normal);
-	vL=normalize(V*lightPosition-V*M*vertex); //pointing from light to fragment
-	vV=normalize(V*M*vertex - V*lightPosition); //pointing from fragment to light
+	vL=normalize(V*lightPosition-V*M*vertex);
+	vV=normalize(V*M*vertex - V*lightPosition);
 
     textureCoordinates = inTextureCoordinates;
 }

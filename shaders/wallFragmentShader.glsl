@@ -4,9 +4,9 @@ uniform float cutoffAngle;
 uniform sampler2D textureMap;
 uniform sampler2D textureShineMap;
 
-in vec4 vN; //interpolated normal vector in the eye space
-in vec4 vV; //interpolated viewer vector in the eye space
-in vec4 vL; //interpolated light vector in the eye space
+in vec4 vN;
+in vec4 vV;
+in vec4 vL;
 in vec4 lightRayWorldSpace;
 in vec4 vertexPosWorldSpace;
 in vec4 lightDir;
