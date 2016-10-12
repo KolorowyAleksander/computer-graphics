@@ -151,14 +151,15 @@ void Main::drawObject(
 
   glUniform1i(shaderProgram->getUniformLocation(TEXTURE_MAP), 0);
   glUniform1i(shaderProgram->getUniformLocation("textureShineMap"), 0);
-  glUniform1f(shaderProgram->getUniformLocation("cutoffAngle"), glm::cos(glm::radians(12.5f)));
+  glUniform1f(shaderProgram->getUniformLocation("umbra"), glm::cos(glm::radians(12.5f)));
+  glUniform1f(shaderProgram->getUniformLocation("penumbra"), glm::cos(glm::radians(20.0f)));
 
   glUniform4f(
       shaderProgram->getUniformLocation(LIGHT_DIRECTION),
       Camera::getInstance()->getDirection().x,
       Camera::getInstance()->getDirection().y,
       Camera::getInstance()->getDirection().z,
-      1
+      0
   );
 
   glUniform4f(

@@ -1,46 +1,51 @@
 #version 130
 
-uniform float cutoffAngle;
+uniform float umbra;
+uniform float penumbra;
+
 uniform sampler2D textureMap;
 uniform sampler2D textureShineMap;
 
-in vec4 vN;
-in vec4 vV;
-in vec4 vL;
-in vec4 lightRayWorldSpace;
-in vec4 vertexPosWorldSpace;
-in vec4 lightDir;
+in vec4 normalVectorEyeSpace;
+in vec4 lightVectorEyeSpace;
+in vec4 lightDirectionEyeSpace;
+
 in float distance;
 in vec2 textureCoordinates;
 
-out vec4 pixelColor; //Fragment shader output variable. Returns the (almost) final pixel color.
+out vec4 pixelColor;
 
 void main(void) {
 
-    vec4 mN=normalize(vN); //normalize interpolated normal vector in the eye space
-    vec4 mL=normalize(vL); //normalize interpolated viewer vector in the eye space
-    vec4 mV=normalize(vV); //normalize interpolated light vector in the eye space
-    vec4 mR=reflect(-mL,mN); //compute reflected light vector in the eye space
+    vec4 normalVector = normalize(normalVectorEyeSpace);
+    vec4 lightVector = normalize(lightVectorEyeSpace);
 
-    vec4 La=vec4(0,0,0,1);
-    vec4 Ma=vec4(0,0,0,1);
+    float attenuation = 1/(distance*distance);
 
-    vec4 Ls=vec4(1,1,1,1); //Specular light color
-    vec4 Ms=texture(textureShineMap, textureCoordinates);
-    vec4 Ld=vec4(1,1,1,1);
-    vec4 Md=texture(textureMap, textureCoordinates);
+    vec4 lightDiffuse = vec4(1, 1, 1, 1);
+    vec4 diffuse = attenuation * texture(textureMap, textureCoordinates);
 
-    float shininess=25;
-    float nl=max(0,dot(mL,mN)); //Compute Lambert's term
-    float rv=pow(max(0,dot(mR,mL)), shininess); //Compute Phong's term
+    vec4 lightAmbient=vec4(0, 0, 0, 1);
+    vec4 ambient=vec4(0.3, 0.3, 0.3, 1) * diffuse;
 
-    float theta = dot(lightRayWorldSpace, -lightDir);
 
-    if(theta < cutoffAngle) {
-        if (distance != 0) {
-        pixelColor=Ma*La+0.5*1/distance*Md*Ld+1/distance*Ms*Ls*rv; //Compute shading model and return as pixel color
-        }
+    vec4 reflection = reflect(-lightVector, normalVector);
+
+    vec4 specular =
+        attenuation
+        * texture(textureShineMap, textureCoordinates)
+        * pow(clamp(dot(lightVector, reflection), 0, 1), 10);
+
+    //consine of angle which cuts off the light around
+    float theta = dot(-lightVector, normalize(lightDirectionEyeSpace));
+
+    if(theta > umbra) {
+        pixelColor = ambient * lightAmbient + diffuse * lightDiffuse + specular;
+    } else if (theta > penumbra){
+        float epsilon = umbra - penumbra;
+        float intensity = clamp((theta - penumbra) / epsilon, 0.0, 1.0);
+        pixelColor = intensity * (diffuse * lightDiffuse + ambient * lightAmbient + specular);
     } else {
-        pixelColor=0.01*Md*Ld;
+        pixelColor = ambient * lightAmbient;
     }
 }
