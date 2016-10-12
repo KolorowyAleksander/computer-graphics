@@ -24,6 +24,8 @@ void Camera::key_callback(GLFWwindow *window, int key, int scancode, int action,
         break;
       case GLFW_KEY_D:camera->setMoveY(1);
         break;
+      case GLFW_KEY_L:camera->lightSwitch = !camera->lightSwitch;
+        break;
       case GLFW_KEY_ESCAPE:glfwSetWindowShouldClose(window, 1);
       default:break;
     }
@@ -76,7 +78,10 @@ void Camera::computeCamera(GLFWwindow *window, float deltaTime, std::vector<glm:
   glfwSetCursorPos(window, double(windowWidth / 2), double(windowHeight / 2));
 
   this->horizontalSightAngle += mouseSpeed * deltaTime * (windowWidth / 2 - xpos);
-  this->verticalSightAngle += mouseSpeed * deltaTime * (windowHeight / 2 - ypos);
+  if (this->verticalSightAngle + mouseSpeed * deltaTime * (windowHeight / 2 - ypos) < 1.0f
+      && this->verticalSightAngle + mouseSpeed * deltaTime * (windowHeight / 2 - ypos) > -1.0f) {
+    this->verticalSightAngle += mouseSpeed * deltaTime * (windowHeight / 2 - ypos);
+  }
 
   this->direction =
       glm::vec3(
@@ -136,6 +141,7 @@ void Camera::setMoveY(int moveY) {
 }
 
 Camera::Camera() {
+  this->lightSwitch = false;
   this->moveX = 0;
   this->moveY = 0;
   this->horizontalSightAngle = 3.14f;
@@ -175,4 +181,11 @@ glm::vec3 Camera::getPosition() {
 }
 glm::vec3 Camera::getDirection() {
   return this->direction;
+}
+int Camera::getSwitch() {
+  if (lightSwitch) {
+    return 1;
+  } else {
+    return 0;
+  }
 }

@@ -16,6 +16,8 @@ class Camera { //camera singleton
   static Camera *instance;
   Camera();
 
+  bool lightSwitch;
+
   glm::vec3 direction;
   glm::vec3 up;
   glm::vec3 position;
@@ -37,6 +39,8 @@ class Camera { //camera singleton
   glm::mat4 getVievMatrix();
   glm::vec3 getPosition();
   glm::vec3 getDirection();
+  int getSwitch();
+
   void setMoveX(int moveX);
   void setMoveY(int moveY);
   bool checkCollision(glm::vec4 position, std::vector<glm::mat4> vector);

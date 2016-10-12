@@ -154,6 +154,8 @@ void Main::drawObject(
   glUniform1f(shaderProgram->getUniformLocation("umbra"), glm::cos(glm::radians(12.5f)));
   glUniform1f(shaderProgram->getUniformLocation("penumbra"), glm::cos(glm::radians(20.0f)));
 
+  glUniform1i(shaderProgram->getUniformLocation("lightSwitch"), Camera::getInstance()->getSwitch());
+
   glUniform4f(
       shaderProgram->getUniformLocation(LIGHT_DIRECTION),
       Camera::getInstance()->getDirection().x,
